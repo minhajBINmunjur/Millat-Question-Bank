@@ -1,0 +1,953 @@
+// Millat Question Bank - React Application
+const { useState, useEffect, useMemo } = React;
+
+// Default Campuses Data
+const INITIAL_CAMPUSES = [
+  {
+    id: "jatrabari",
+    name: "যাত্রাবাড়ী প্রধান ক্যাম্পাস",
+    enName: "Main Campus (Jatrabari)",
+    tagline: "তামীরুল মিল্লাত কামিল মাদ্রাসা, প্রধান শাখা",
+    image: "assets/images/campus_1.jpg",
+    color: "#22c55e",
+    borderColor: "border-emerald-500",
+    badge: "মেইন ক্যাম্পাস",
+    questionCount: 890,
+  },
+  {
+    id: "tongi",
+    name: "টঙ্গী বিজ্ঞান ক্যাম্পাস",
+    enName: "Tongi Campus",
+    tagline: "তামীরুল মিল্লাত কামিল মাদ্রাসা, টঙ্গী কমপ্লেক্স শাখা",
+    image: "assets/images/campus_2.jpg",
+    color: "#f97316",
+    borderColor: "border-orange-500",
+    badge: "বিজ্ঞান ও বয়েজ কমপ্লেক্স",
+    questionCount: 760,
+  },
+  {
+    id: "female",
+    name: "মহিলা ক্যাম্পাস",
+    enName: "Mohakhali / Female Campus",
+    tagline: "তামীরুল মিল্লাত মহিলা কামিল মাদ্রাসা শাখা",
+    image: "assets/images/campus_3.jpg",
+    color: "#eab308",
+    borderColor: "border-yellow-500",
+    badge: "মহিলা শাখা",
+    questionCount: 640,
+  },
+];
+
+// Subjects Data for Alim and Dakhil
+const SUBJECTS_DATA = {
+  alim: [
+    { id: "phy1", name: "Physics 1st", bn: "পদার্থবিজ্ঞান ১ম পত্র", icon: "fa-atom" },
+    { id: "phy2", name: "Physics 2nd", bn: "পদার্থবিজ্ঞান ২য় পত্র", icon: "fa-bolt" },
+    { id: "chem1", name: "Chemistry 1st", bn: "রসায়ন ১ম পত্র", icon: "fa-flask" },
+    { id: "chem2", name: "Chemistry 2nd", bn: "রসায়ন ২য় পত্র", icon: "fa-vial" },
+    { id: "bio1", name: "Bio 1st", bn: "জীববিজ্ঞান ১ম পত্র (উদ্ভিদ)", icon: "fa-seedling" },
+    { id: "bio2", name: "Bio 2nd", bn: "জীববিজ্ঞান ২য় পত্র (প্রাণী)", icon: "fa-dna" },
+    { id: "math1", name: "Math 1st", bn: "উচ্চতর গণিত ১ম পত্র", icon: "fa-calculator" },
+    { id: "math2", name: "Math 2nd", bn: "উচ্চতর গণিত ২য় পত্র", icon: "fa-square-root-variable" },
+    { id: "ict", name: "ICT", bn: "তথ্য ও যোগাযোগ প্রযুক্তি", icon: "fa-laptop-code" },
+    { id: "pouroniti1", name: "Pouroniti 1st", bn: "পৌরনীতি ও সুশাসন ১ম পত্র", icon: "fa-landmark" },
+    { id: "pouroniti2", name: "Pouroniti 2nd", bn: "পৌরনীতি ও সুশাসন ২য় পত্র", icon: "fa-scale-balanced" },
+    { id: "eco1", name: "Economics 1st", bn: "অর্থনীতি ১ম পত্র", icon: "fa-chart-line" },
+    { id: "eco2", name: "Economics 2nd", bn: "অর্থনীতি ২য় পত্র", icon: "fa-coins" },
+    { id: "bangla2", name: "Bangla 2nd", bn: "বাংলা ২য় পত্র", icon: "fa-book-open" },
+    { id: "quran", name: "Quran Majid", bn: "কুরআন মাজীদ ও হাদিস", icon: "fa-book-quran" },
+  ],
+  dakhil: [
+    { id: "d_phy", name: "Physics", bn: "পদার্থবিজ্ঞান", icon: "fa-atom" },
+    { id: "d_chem", name: "Chemistry", bn: "রসায়ন", icon: "fa-flask" },
+    { id: "d_bio", name: "Biology", bn: "জীববিজ্ঞান", icon: "fa-dna" },
+    { id: "d_gmath", name: "G. Math", bn: "সাধারণ গণিত", icon: "fa-calculator" },
+    { id: "d_hmath", name: "H. Math", bn: "উচ্চতর গণিত", icon: "fa-square-root-variable" },
+    { id: "d_ict", name: "ICT", bn: "তথ্য ও যোগাযোগ প্রযুক্তি", icon: "fa-laptop-code" },
+    { id: "d_pouroniti", name: "Pouroniti", bn: "পৌরনীতি ও নাগরিকতা", icon: "fa-landmark" },
+    { id: "d_eco", name: "Economics", bn: "অর্থনীতি", icon: "fa-chart-line" },
+    { id: "d_bangla", name: "Bangla", bn: "বাংলা সাহিত্য ও ব্যাকরণ", icon: "fa-book-open" },
+    { id: "d_english", name: "English", bn: "ইংরেজি ১ম ও ২য়", icon: "fa-language" },
+  ],
+};
+
+// Exam Categories matching user's Image 1
+const EXAM_SECTIONS = [
+  {
+    id: "semester",
+    title: "1st semester/semester/half yearly",
+    bnTitle: "১ম সেমিস্টার / অর্ধ-বার্ষিক পরীক্ষা",
+    theme: "blue",
+    bannerClass: "banner-blue",
+    pillClass: "year-pill-blue",
+    borderClass: "border-blue-500/30",
+    years: ["2021", "2022", "2023", "2024", "2025", "2026"],
+  },
+  {
+    id: "yearly",
+    title: "yearly/year final/year change",
+    bnTitle: "বার্ষিক / ইয়ার ফাইনাল / ইয়ার চেঞ্জ",
+    theme: "orange",
+    bannerClass: "banner-orange",
+    pillClass: "year-pill-orange",
+    borderClass: "border-orange-500/30",
+    years: ["2021", "2022", "2023", "2024", "2025", "2026"],
+  },
+  {
+    id: "pretest",
+    title: "pre-test",
+    bnTitle: "প্রি-টেস্ট পরীক্ষা",
+    theme: "dark",
+    bannerClass: "banner-dark",
+    pillClass: "year-pill-dark",
+    borderClass: "border-slate-500/30",
+    years: ["2021", "2022", "2023", "2024", "2025", "2026"],
+  },
+  {
+    id: "test",
+    title: "test",
+    bnTitle: "টেস্ট / নির্বাচনী পরীক্ষা",
+    theme: "gold",
+    bannerClass: "banner-gold",
+    pillClass: "year-pill-gold",
+    borderClass: "border-amber-500/30",
+    years: ["2021", "2022", "2023", "2024", "2025", "2026"],
+  },
+];
+
+function App() {
+  // Navigation State: 'campuses' (page 1) | 'subjects' (page 2) | 'exams' (page 3)
+  const [currentPage, setCurrentPage] = useState("campuses");
+  const [selectedCampus, setSelectedCampus] = useState(null);
+  const [selectedProgram, setSelectedProgram] = useState(null); // 'alim' | 'dakhil'
+  const [selectedSubject, setSelectedSubject] = useState(null);
+  
+  // Custom campus images state (supports local replacement)
+  const [campuses, setCampuses] = useState(() => {
+    const saved = localStorage.getItem("millat_campuses");
+    return saved ? JSON.parse(saved) : INITIAL_CAMPUSES;
+  });
+
+  // Modal States
+  const [activeQuestionModal, setActiveQuestionModal] = useState(null);
+  const [showImageGuideModal, setShowImageGuideModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Persist updated campus images to local storage
+  const updateCampusImage = (campusId, newImageUrl) => {
+    const updated = campuses.map((c) =>
+      c.id === campusId ? { ...c, image: newImageUrl } : c
+    );
+    setCampuses(updated);
+    localStorage.setItem("millat_campuses", JSON.stringify(updated));
+    if (selectedCampus && selectedCampus.id === campusId) {
+      setSelectedCampus({ ...selectedCampus, image: newImageUrl });
+    }
+  };
+
+  const handleSelectCampus = (campus) => {
+    setSelectedCampus(campus);
+    setCurrentPage("subjects");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleSelectSubject = (program, subject) => {
+    setSelectedProgram(program);
+    setSelectedSubject(subject);
+    setCurrentPage("exams");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleOpenQuestion = (examSection, year) => {
+    setActiveQuestionModal({
+      campus: selectedCampus,
+      program: selectedProgram,
+      subject: selectedSubject,
+      examSection,
+      year,
+    });
+  };
+
+  // Search filter results for global search bar
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase();
+    const results = [];
+
+    // Search inside subjects
+    ["alim", "dakhil"].forEach((prog) => {
+      SUBJECTS_DATA[prog].forEach((sub) => {
+        if (
+          sub.name.toLowerCase().includes(q) ||
+          sub.bn.toLowerCase().includes(q)
+        ) {
+          results.push({
+            type: "subject",
+            program: prog,
+            subject: sub,
+            title: `${sub.bn} (${sub.name}) - [${prog.toUpperCase()}]`,
+          });
+        }
+      });
+    });
+
+    // Search campuses
+    campuses.forEach((c) => {
+      if (
+        c.name.toLowerCase().includes(q) ||
+        c.enName.toLowerCase().includes(q)
+      ) {
+        results.push({
+          type: "campus",
+          campus: c,
+          title: `ক্যাম্পাস: ${c.name} (${c.enName})`,
+        });
+      }
+    });
+
+    return results.slice(0, 8);
+  }, [searchQuery, campuses]);
+
+  // Determine current active background image
+  const backgroundStyle = useMemo(() => {
+    if ((currentPage === "subjects" || currentPage === "exams") && selectedCampus) {
+      return {
+        backgroundImage: `url("${selectedCampus.image}")`,
+      };
+    }
+    return {};
+  }, [currentPage, selectedCampus]);
+
+  return (
+    <div className="relative min-h-screen flex flex-col font-sans">
+      {/* Dynamic Campus Background Overlay for Page 2 and 3 */}
+      {(currentPage === "subjects" || currentPage === "exams") && selectedCampus && (
+        <div
+          className="fixed inset-0 bg-cover bg-center -z-10 transition-all duration-700 ease-in-out"
+          style={backgroundStyle}
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/85 via-slate-950/90 to-slate-950/95 backdrop-blur-[6px]" />
+        </div>
+      )}
+
+      {/* Top Navigation Bar */}
+      <header className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+          {/* Logo & Brand */}
+          <div
+            onClick={() => setCurrentPage("campuses")}
+            className="flex items-center gap-3 cursor-pointer group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+              <i className="fa-solid fa-graduation-cap text-lg"></i>
+            </div>
+            <div>
+              <h1 className="text-lg font-bold tracking-tight text-white group-hover:text-emerald-400 transition-colors">
+                Millat Question Bank
+              </h1>
+              <p className="text-xs text-slate-400 font-bangla -mt-0.5">
+                তামীরুল মিল্লাত কামিল মাদ্রাসা
+              </p>
+            </div>
+          </div>
+
+          {/* Quick UIU Style Search input */}
+          <div className="hidden md:flex flex-1 max-w-md mx-6 relative">
+            <div className="relative w-full">
+              <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+              <input
+                type="text"
+                placeholder="Search Subjects, Topics, Campuses..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-900/90 border border-slate-700/80 rounded-full pl-10 pr-4 py-1.5 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                >
+                  <i className="fa-solid fa-xmark text-xs"></i>
+                </button>
+              )}
+            </div>
+
+            {/* Live Search Dropdown */}
+            {searchResults.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50">
+                <div className="p-2 text-xs font-semibold text-slate-400 border-b border-slate-800">
+                  Search Results ({searchResults.length})
+                </div>
+                {searchResults.map((item, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => {
+                      if (item.type === "campus") {
+                        handleSelectCampus(item.campus);
+                      } else {
+                        if (!selectedCampus) setSelectedCampus(campuses[0]);
+                        handleSelectSubject(item.program, item.subject);
+                      }
+                      setSearchQuery("");
+                    }}
+                    className="px-4 py-2.5 hover:bg-slate-800/80 cursor-pointer flex items-center justify-between text-sm transition-colors"
+                  >
+                    <span className="text-slate-200">{item.title}</span>
+                    <i className="fa-solid fa-arrow-right text-xs text-slate-400"></i>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-3">
+            {/* Guide & Manage Images Button */}
+            <button
+              onClick={() => setShowImageGuideModal(true)}
+              className="px-3.5 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 text-xs sm:text-sm font-medium flex items-center gap-2 transition-all shadow-sm"
+              title="কীভাবে ছবি পরিবর্তন বা আপলোড করবেন"
+            >
+              <i className="fa-solid fa-image text-emerald-400"></i>
+              <span className="font-bangla">ছবি আপলোড নির্দেশিকা</span>
+            </button>
+
+            {currentPage !== "campuses" && (
+              <button
+                onClick={() => setCurrentPage("campuses")}
+                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm transition-colors flex items-center gap-1.5"
+              >
+                <i className="fa-solid fa-house text-xs"></i>
+                <span className="hidden sm:inline font-bangla">ক্যাম্পাসসমূহ</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Breadcrumb Navigation for Page 2 and 3 */}
+        {currentPage !== "campuses" && (
+          <nav className="flex items-center gap-2 text-sm text-slate-400 mb-6 bg-slate-900/60 backdrop-blur-md px-4 py-2.5 rounded-xl border border-slate-800/80 w-fit">
+            <button
+              onClick={() => setCurrentPage("campuses")}
+              className="hover:text-emerald-400 transition-colors flex items-center gap-1.5 font-medium"
+            >
+              <i className="fa-solid fa-building-columns text-xs text-emerald-400"></i>
+              <span>ক্যাম্পাস</span>
+            </button>
+            <i className="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+
+            {selectedCampus && (
+              <button
+                onClick={() => setCurrentPage("subjects")}
+                className={`transition-colors font-medium ${
+                  currentPage === "subjects"
+                    ? "text-emerald-400 font-semibold"
+                    : "hover:text-emerald-400"
+                }`}
+              >
+                {selectedCampus.name}
+              </button>
+            )}
+
+            {currentPage === "exams" && selectedSubject && (
+              <>
+                <i className="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+                <span className="text-slate-400 uppercase text-xs font-bold tracking-wider px-1.5 py-0.5 rounded bg-slate-800">
+                  {selectedProgram}
+                </span>
+                <i className="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+                <span className="text-white font-semibold">
+                  {selectedSubject.bn} ({selectedSubject.name})
+                </span>
+              </>
+            )}
+          </nav>
+        )}
+
+        {/* PAGE 1: CAMPUS SELECTION (১ম পেজ - তোমার ক্যাম্পাস ক্লিক করো) */}
+        {currentPage === "campuses" && (
+          <section className="space-y-10 animate-fadeIn">
+            {/* Hero Header Box matching User's Sketch (Millat Question Bank with Green Border & Building Image) */}
+            <div className="relative overflow-hidden rounded-3xl border-2 border-emerald-500/70 bg-gradient-to-r from-slate-900 via-slate-900/90 to-emerald-950/40 shadow-2xl p-6 sm:p-8 lg:p-10 transition-all hover:border-emerald-400">
+              <div className="absolute -right-16 -top-16 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+                
+                {/* Left: Millat Question Bank Title & Search */}
+                <div className="space-y-5 max-w-xl text-center lg:text-left flex-1">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 text-xs font-semibold tracking-wide uppercase">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Official Question Bank Portal
+                  </div>
+
+                  <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-none font-sans">
+                    Millat Question Bank
+                  </h2>
+
+                  <p className="text-sm sm:text-base text-slate-300 font-bangla leading-relaxed">
+                    তামীরুল মিল্লাত কামিল মাদ্রাসার সকল ক্যাম্পাস, আলিম ও দাখিল শ্রেণির বিগত বছরের পরীক্ষার প্রশ্নপত্রের এক অনন্য ডিজিটাল সংগ্রহশালা।
+                  </p>
+
+                  {/* UIU Question Bank style search bar inside hero box */}
+                  <div className="pt-2 max-w-md mx-auto lg:mx-0">
+                    <div className="relative">
+                      <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400 text-sm"></i>
+                      <input
+                        type="text"
+                        placeholder="Search Courses, Subjects, Years..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full bg-slate-950/90 border-2 border-emerald-500/50 rounded-2xl pl-11 pr-4 py-3 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 transition-all shadow-lg"
+                      />
+                      {searchQuery && (
+                        <button
+                          onClick={() => setSearchQuery("")}
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                        >
+                          <i className="fa-solid fa-xmark"></i>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: User's Uploaded Campus Building Image */}
+                <div className="w-full lg:w-[480px] h-60 sm:h-72 lg:h-80 rounded-2xl overflow-hidden border-2 border-emerald-400/60 shadow-2xl relative group flex-shrink-0">
+                  <img
+                    src="assets/images/header_banner.jpg"
+                    alt="Millat Campus Building"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-4">
+                    <div className="flex items-center gap-2 text-xs text-white font-bangla font-semibold bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-700">
+                      <i className="fa-solid fa-landmark text-emerald-400"></i>
+                      <span>তামীরুল মিল্লাত কামিল মাদ্রাসা প্রধান একাডেমিক ভবন</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Central Callout: "tomar campus click koro" */}
+            <div className="text-center space-y-2 pt-2">
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-white font-bangla tracking-wide">
+                তোমার ক্যাম্পাস ক্লিক করো
+              </h2>
+              <p className="text-slate-400 text-sm sm:text-base font-bangla">
+                নিচের যেকোনো একটি ক্যাম্পাসে ক্লিক করে সংশ্লিষ্ট ক্যাম্পাসের প্রশ্নপত্রে প্রবেশ করো
+              </p>
+            </div>
+
+            {/* 3 Campus Cards (Matching user's Image 3: 3 distinct clickable image buttons) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 pt-2">
+              {campuses.map((campus, index) => (
+                <div
+                  key={campus.id}
+                  onClick={() => handleSelectCampus(campus)}
+                  className="group relative cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-800 hover:border-emerald-500 bg-slate-900/80 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/20 flex flex-col"
+                >
+                  {/* Top Image Box */}
+                  <div className="relative h-56 sm:h-64 w-full overflow-hidden bg-slate-950">
+                    <img
+                      src={campus.image}
+                      alt={campus.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src =
+                          "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&auto=format&fit=crop&q=60";
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent opacity-75 group-hover:opacity-60 transition-opacity" />
+
+                    {/* Tag Badge */}
+                    <div className="absolute top-3.5 right-3.5">
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-950/80 backdrop-blur-md text-emerald-400 border border-emerald-500/40 font-bangla shadow-md">
+                        {campus.badge}
+                      </span>
+                    </div>
+
+                    {/* Question Count Pill */}
+                    <div className="absolute bottom-3 left-3 flex items-center gap-1.5 text-xs font-medium text-slate-200 bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-slate-700/80">
+                      <i className="fa-solid fa-file-circle-check text-emerald-400"></i>
+                      <span className="font-bangla">{campus.questionCount}+ প্রশ্নপত্র</span>
+                    </div>
+                  </div>
+
+                  {/* Card Content & Action Button */}
+                  <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-white group-hover:text-emerald-400 transition-colors font-bangla">
+                        {campus.name}
+                      </h3>
+                      <p className="text-xs text-slate-400 font-medium tracking-wide mt-0.5">
+                        {campus.enName}
+                      </p>
+                      <p className="text-xs text-slate-400 font-bangla mt-2 line-clamp-2">
+                        {campus.tagline}
+                      </p>
+                    </div>
+
+                    {/* Interactive Button */}
+                    <button className="w-full py-2.5 px-4 rounded-xl bg-slate-800 group-hover:bg-emerald-600 text-slate-200 group-hover:text-white font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm font-bangla">
+                      <span>এই ক্যাম্পাস নির্বাচন করো</span>
+                      <i className="fa-solid fa-arrow-right-long text-xs group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* PAGE 2: CLASS & SUBJECT SELECTION (২য় পেজ - ক্যাম্পাস চুজ করার পর) */}
+        {currentPage === "subjects" && selectedCampus && (
+          <section className="space-y-8 animate-fadeIn">
+            {/* Campus Header Info */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl glass-card border border-slate-700/60 shadow-xl">
+              <div>
+                <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-1">
+                  <i className="fa-solid fa-location-dot"></i>
+                  <span>নির্বাচিত ক্যাম্পাস</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-bangla">
+                  {selectedCampus.name}
+                </h2>
+                <p className="text-slate-300 text-xs sm:text-sm font-bangla mt-0.5">
+                  নিচের আলিম (Alim) বা দাখিল (Dakhil) থেকে তোমার কাঙ্ক্ষিত বিষয়ের বাটনে ক্লিক করো
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setCurrentPage("campuses")}
+                  className="px-4 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-sm font-bangla flex items-center gap-2 border border-slate-700 transition-all"
+                >
+                  <i className="fa-solid fa-arrow-left text-xs"></i>
+                  <span>অন্য ক্যাম্পাস বদলান</span>
+                </button>
+              </div>
+            </div>
+
+            {/* SECTION 1: ALIM (আলিম শাখা) */}
+            <div className="rounded-2xl overflow-hidden border border-emerald-800/40 glass-card shadow-2xl">
+              {/* Alim Top Green Header matching Mockup */}
+              <div className="bg-emerald-950/90 border-b border-emerald-700/50 px-6 py-3.5 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="w-3 h-3 rounded-full bg-emerald-400"></span>
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-emerald-100 tracking-wide">
+                    Alim
+                  </h3>
+                  <span className="text-xs bg-emerald-900 text-emerald-300 px-2.5 py-0.5 rounded-full font-bangla border border-emerald-700/60">
+                    আলিম (একাদশ ও দ্বাদশ শ্রেণি)
+                  </span>
+                </div>
+                <span className="text-xs text-emerald-300 font-bangla hidden sm:inline">
+                  {SUBJECTS_DATA.alim.length} টি বিষয় অন্তর্ভুক্ত
+                </span>
+              </div>
+
+              {/* Alim Subject Pill Buttons */}
+              <div className="p-6 sm:p-8">
+                <div className="flex flex-wrap gap-3 sm:gap-4 items-center">
+                  {SUBJECTS_DATA.alim.map((sub) => (
+                    <button
+                      key={sub.id}
+                      onClick={() => handleSelectSubject("alim", sub)}
+                      className="subject-btn group"
+                    >
+                      <i className={`fa-solid ${sub.icon} text-emerald-400 group-hover:text-white transition-colors text-sm`}></i>
+                      <span>{sub.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 2: DAKHIL (দাখিল শাখা) */}
+            <div className="rounded-2xl overflow-hidden border border-rose-900/40 glass-card shadow-2xl">
+              {/* Dakhil Top Maroon/Dark Header matching Mockup */}
+              <div className="bg-rose-950/90 border-b border-rose-800/50 px-6 py-3.5 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="w-3 h-3 rounded-full bg-rose-400"></span>
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-rose-100 tracking-wide">
+                    Dakhil
+                  </h3>
+                  <span className="text-xs bg-rose-900 text-rose-300 px-2.5 py-0.5 rounded-full font-bangla border border-rose-700/60">
+                    দাখিল (নবম ও দশম শ্রেণি)
+                  </span>
+                </div>
+                <span className="text-xs text-rose-300 font-bangla hidden sm:inline">
+                  {SUBJECTS_DATA.dakhil.length} টি বিষয় অন্তর্ভুক্ত
+                </span>
+              </div>
+
+              {/* Dakhil Subject Pill Buttons */}
+              <div className="p-6 sm:p-8">
+                <div className="flex flex-wrap gap-3 sm:gap-4 items-center">
+                  {SUBJECTS_DATA.dakhil.map((sub) => (
+                    <button
+                      key={sub.id}
+                      onClick={() => handleSelectSubject("dakhil", sub)}
+                      className="subject-btn group"
+                    >
+                      <i className={`fa-solid ${sub.icon} text-rose-400 group-hover:text-white transition-colors text-sm`}></i>
+                      <span>{sub.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* PAGE 3: EXAM SECTIONS & YEARS (৩য় পেজ - বিষয় সিলেক্ট করার পর প্রশ্ন ব্যাংক) */}
+        {currentPage === "exams" && selectedSubject && selectedCampus && (
+          <section className="space-y-8 animate-fadeIn">
+            {/* Header Details */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl glass-card border border-slate-700/80 shadow-xl">
+              <div>
+                <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-1">
+                  <span>{selectedCampus.name}</span>
+                  <i className="fa-solid fa-circle text-[4px] text-slate-500"></i>
+                  <span className="text-cyan-400 uppercase">{selectedProgram}</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
+                  <span>{selectedSubject.bn}</span>
+                  <span className="text-lg text-slate-400 font-normal">
+                    ({selectedSubject.name})
+                  </span>
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-300 font-bangla mt-1">
+                  নিচের যেকোনো পরীক্ষার সাল (Year Button)-এ ক্লিক করে প্রশ্নপত্র ও উত্তরমালা দেখুন।
+                </p>
+              </div>
+
+              <button
+                onClick={() => setCurrentPage("subjects")}
+                className="w-fit px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-bangla flex items-center gap-2 border border-slate-700 transition-colors"
+              >
+                <i className="fa-solid fa-arrow-left text-xs"></i>
+                <span>অন্য বিষয় নির্বাচন</span>
+              </button>
+            </div>
+
+            {/* 4 Distinct Exam Sections matching Mockup Image 1 */}
+            <div className="space-y-6">
+              {EXAM_SECTIONS.map((section) => (
+                <div
+                  key={section.id}
+                  className={`rounded-2xl border-2 ${section.borderClass} glass-card overflow-hidden shadow-xl transition-all duration-300 hover:border-slate-500`}
+                >
+                  {/* Stylized Section Header Banner with slant/curve */}
+                  <div className="pt-0 pl-0">
+                    <div className={`exam-header-banner ${section.bannerClass}`}>
+                      <span className="text-sm sm:text-base font-bold tracking-wide">
+                        {section.title}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Year Buttons row inside the container box */}
+                  <div className="p-6 sm:p-7">
+                    <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                      {section.years.map((year) => (
+                        <button
+                          key={year}
+                          onClick={() => handleOpenQuestion(section, year)}
+                          className={`year-pill-btn ${section.pillClass}`}
+                        >
+                          <span>{year}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </main>
+
+      {/* FOOTER */}
+      <footer className="mt-16 border-t border-slate-800/80 bg-slate-950/80 py-8 px-4 text-center text-xs text-slate-400 font-bangla">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p>© 2026 Millat Question Bank | তামীরুল মিল্লাত কামিল মাদ্রাসা কোশ্চেন ব্যাংক পোর্টাল</p>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setShowImageGuideModal(true)}
+              className="text-emerald-400 hover:underline"
+            >
+              ছবি নির্দেশিকা ও ম্যানেজমেন্ট
+            </button>
+            <span>•</span>
+            <span>React & Tailwind Powered</span>
+          </div>
+        </div>
+      </footer>
+
+      {/* QUESTION PAPER VIEWER MODAL */}
+      {activeQuestionModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
+          <div className="relative w-full max-w-4xl bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden modal-enter my-auto">
+            {/* Modal Header */}
+            <div className="px-6 py-4 bg-slate-800/90 border-b border-slate-700 flex items-center justify-between">
+              <div>
+                <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
+                  {activeQuestionModal.campus.name} • {activeQuestionModal.program.toUpperCase()}
+                </span>
+                <h3 className="text-lg sm:text-xl font-bold text-white">
+                  {activeQuestionModal.subject.bn} — {activeQuestionModal.year}
+                </h3>
+                <p className="text-xs text-slate-400 font-bangla">
+                  পরীক্ষা: {activeQuestionModal.examSection.bnTitle} ({activeQuestionModal.examSection.title})
+                </p>
+              </div>
+
+              <button
+                onClick={() => setActiveQuestionModal(null)}
+                className="w-9 h-9 rounded-full bg-slate-700/60 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors"
+              >
+                <i className="fa-solid fa-xmark text-base"></i>
+              </button>
+            </div>
+
+            {/* Modal Body: Question Paper Simulator */}
+            <div className="p-6 max-h-[72vh] overflow-y-auto bg-slate-950/60 space-y-6">
+              {/* Paper Top Banner */}
+              <div className="p-6 bg-white text-slate-900 rounded-xl shadow-lg border border-slate-300 space-y-4 font-serif">
+                <div className="text-center border-b-2 border-slate-900 pb-3">
+                  <h4 className="text-xl font-extrabold tracking-wide uppercase">
+                    তামীরুল মিল্লাত কামিল মাদ্রাসা
+                  </h4>
+                  <p className="text-sm font-semibold text-slate-700">
+                    {activeQuestionModal.campus.name}
+                  </p>
+                  <p className="text-sm font-bold mt-1">
+                    {activeQuestionModal.examSection.bnTitle} — {activeQuestionModal.year}
+                  </p>
+                  <div className="flex justify-between items-center text-xs font-bold pt-2 px-2">
+                    <span>শ্রেণি: {activeQuestionModal.program === "alim" ? "আলিম" : "দাখিল"}</span>
+                    <span>বিষয়: {activeQuestionModal.subject.bn} ({activeQuestionModal.subject.name})</span>
+                    <span>পূর্ণমান: ১০০ | সময়: ৩ ঘণ্টা</span>
+                  </div>
+                </div>
+
+                {/* Question Section A (CQ / সৃজনশীল) */}
+                <div className="space-y-4 pt-2">
+                  <div className="bg-slate-100 p-2 rounded text-xs font-bold text-slate-800">
+                    ক-বিভাগ : সৃজনশীল প্রশ্ন (যেকোনো ৫টি প্রশ্নের উত্তর দাও : ৫ × ১০ = ৫০)
+                  </div>
+
+                  <div className="space-y-3 text-sm leading-relaxed pl-2">
+                    <div>
+                      <p className="font-bold">
+                        ১. উদ্দীপকটি লক্ষ্য করো এবং প্রশ্নগুলোর উত্তর দাও:
+                      </p>
+                      <p className="text-slate-700 text-xs italic pl-4 border-l-2 border-slate-400 my-1">
+                        &quot;একটি নির্দিষ্ট বস্তুর উপর প্রযুক্ত বল ও ত্বরণের পরিবর্তন নিয়ে পরীক্ষাগারে ছাত্ররা একটি বিশেষ পরীক্ষা পরিচালনা করলো। প্রাপ্ত তথ্যানুসারে সময়ের সাথে সাথে অবস্থানের পরিবর্তন লক্ষ্য করা যায়।&quot;
+                      </p>
+                      <ul className="text-xs space-y-1 pl-4 pt-1">
+                        <li>(ক) মাত্রা সমীকরণ কাকে বলে? — [১]</li>
+                        <li>(খ) কোনো বস্তুর জড়তার ভ্রামক কীভাবে নির্ণয় করা হয়? ব্যাখ্যা করো। — [২]</li>
+                        <li>(গ) উদ্দীপকের আলোকে প্রদত্ত সময়ের ত্বরণ নির্ণয় করো। — [৩]</li>
+                        <li>(ঘ) উদ্দীপকের ফলাফল শক্তির সংরক্ষণশীলতা নীতি সমর্থন করে কি? গাণিতিকভাবে বিশ্লেষণ করো। — [৪]</li>
+                      </ul>
+                    </div>
+
+                    <div className="pt-2">
+                      <p className="font-bold">
+                        ২. ২য় অধ্যায়ের বিষয়বস্তু হতে সৃজনশীল প্রশ্ন:
+                      </p>
+                      <p className="text-slate-700 text-xs italic pl-4 border-l-2 border-slate-400 my-1">
+                        &quot;৫ কেজি ভরের একটি গোলক খাড়া উপরের দিকে ৩০ মি./সে. বেগে নিক্ষেপ করা হলো। একই সাথে অপর একটি বস্তু উপর থেকে মুক্তভাবে পড়তে দেওয়া হলো।&quot;
+                      </p>
+                      <ul className="text-xs space-y-1 pl-4 pt-1">
+                        <li>(ক) অভিকর্ষজ ত্বরণের আদর্শ মান কত? — [১]</li>
+                        <li>(খ) মহাকর্ষীয় ধ্রুবক বলতে কী বোঝো? — [২]</li>
+                        <li>(গ) গোলকটি সর্বোচ্চ কত উচ্চতায় উঠবে তা বের করো। — [৩]</li>
+                        <li>(ঘ) বায়ুর বাধা অগ্রাহ্য করলে কত উচ্চতায় বস্তুদ্বয়ের বেগ সমান হবে? যাচাই করো। — [৪]</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Question Section B (MCQ preview) */}
+                <div className="space-y-3 pt-2">
+                  <div className="bg-slate-100 p-2 rounded text-xs font-bold text-slate-800">
+                    খ-বিভাগ : বহুনির্বাচনী প্রশ্ন (MCQ) (২৫টি প্রশ্নের উত্তর দাও : ২৫ × ১ = ২৫)
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pl-2">
+                    <div className="p-2 border rounded bg-slate-50">
+                      <p className="font-semibold">১. কাজের মাত্রা কোনটি?</p>
+                      <p className="text-slate-600 mt-1">ক) MLT⁻¹ &nbsp; খ) ML²T⁻² &nbsp; গ) ML⁻¹T &nbsp; ঘ) MLT⁻²</p>
+                    </div>
+                    <div className="p-2 border rounded bg-slate-50">
+                      <p className="font-semibold">২. পরম শূন্য তাপমাত্রা কত?</p>
+                      <p className="text-slate-600 mt-1">ক) 0°C &nbsp; খ) -273.15°C &nbsp; গ) 273 K &nbsp; ঘ) 100°C</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="px-6 py-4 bg-slate-800/80 border-t border-slate-700 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-xs text-slate-400">
+                <i className="fa-solid fa-file-pdf text-rose-400"></i>
+                <span>PDF Format Available</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => window.print()}
+                  className="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-medium flex items-center gap-2 transition-colors font-bangla"
+                >
+                  <i className="fa-solid fa-print"></i>
+                  <span>প্রিন্ট করো</span>
+                </button>
+
+                <button
+                  onClick={() => alert(`ডাউনলোড শুরু হচ্ছে: ${activeQuestionModal.subject.name}_${activeQuestionModal.year}.pdf`)}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium flex items-center gap-2 transition-all font-bangla shadow-lg shadow-emerald-600/30"
+                >
+                  <i className="fa-solid fa-download"></i>
+                  <span>প্রশ্ন ডাউনলোড করো (PDF)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* HOW TO SUPPLY IMAGES & LIVE IMAGE MANAGER MODAL */}
+      {showImageGuideModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
+          <div className="relative w-full max-w-3xl bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden modal-enter my-auto font-bangla">
+            {/* Modal Header */}
+            <div className="px-6 py-4 bg-slate-800/90 border-b border-slate-700 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                  <i className="fa-solid fa-images text-lg"></i>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">
+                    ইমেজ প্রদান ও যুক্ত করার উপায় (Image Guide)
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    আপনার যেকোনো ক্যাম্পাসের ছবি বা প্রশ্নপত্র সহজেই যেভাবে যুক্ত করবেন
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowImageGuideModal(false)}
+                className="w-8 h-8 rounded-full bg-slate-700/60 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors"
+              >
+                <i className="fa-solid fa-xmark text-sm"></i>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 max-h-[75vh] overflow-y-auto space-y-6 text-slate-200 text-sm">
+              {/* Option 1 */}
+              <div className="p-4 rounded-xl bg-slate-800/60 border border-slate-700 space-y-2">
+                <div className="flex items-center gap-2 text-emerald-400 font-bold">
+                  <span className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs">
+                    ১
+                  </span>
+                  <span>চ্যাটে সরাসরি ছবি সেন্ড করা (সবচেয়ে সহজ)</span>
+                </div>
+                <p className="text-slate-300 text-xs leading-relaxed pl-8">
+                  আপনি এই চ্যাটবক্সের <strong>Attachment / Image icon</strong> এ ক্লিক করে অথবা আপনার কম্পিউটার থেকে ছবি drag &amp; drop করে পাঠিয়ে দিলেই হবে। আমি সাথে সাথে আপনার সেই ছবিগুলো ওয়েবসাইটের সঠিক ক্যাম্পাসের কার্ডে ও ব্যাকগ্রাউন্ডে সেট করে দিব।
+                </p>
+              </div>
+
+              {/* Option 2 */}
+              <div className="p-4 rounded-xl bg-slate-800/60 border border-slate-700 space-y-2">
+                <div className="flex items-center gap-2 text-cyan-400 font-bold">
+                  <span className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center text-xs">
+                    ২
+                  </span>
+                  <span>লোকাল ফোল্ডারে রেখে দেওয়া</span>
+                </div>
+                <p className="text-slate-300 text-xs leading-relaxed pl-8">
+                  আপনার প্রজেক্টের <code>assets/images/</code> ফোল্ডারে আপনার ছবিগুলো রেখে দিতে পারেন (যেমন: <code>campus_1.png</code>, <code>campus_2.png</code> ইত্যাদি)। ওয়েবসাইট নিজে থেকেই লোকাল ফাইল থেকে লোড করে নিবে।
+                </p>
+              </div>
+
+              {/* Option 3: LIVE IN-BROWSER IMAGE UPLOAD & CHOOSE */}
+              <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/40 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-emerald-300 font-bold">
+                    <span className="w-6 h-6 rounded-full bg-emerald-500/30 flex items-center justify-center text-xs">
+                      ৩
+                    </span>
+                    <span>সরাসরি ব্রাউজারে লাইভ ছবি পরিবর্তন (Live Uploader)</span>
+                  </div>
+                  <span className="text-[11px] bg-emerald-800/60 text-emerald-200 px-2 py-0.5 rounded">
+                    কাজ করছে
+                  </span>
+                </div>
+
+                <p className="text-xs text-slate-300 pl-8">
+                  আপনি এখনই যেকোনো ক্যাম্পাসের ছবির জন্য নিজের কম্পিউটার থেকে একটি ছবি সিলেক্ট করে দেখতে পারেন:
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                  {campuses.map((c) => (
+                    <div key={c.id} className="p-3 bg-slate-900/90 rounded-xl border border-slate-700 text-center space-y-2">
+                      <div className="h-24 w-full rounded-lg overflow-hidden bg-slate-950 border border-slate-800">
+                        <img src={c.image} alt={c.name} className="w-full h-full object-cover" />
+                      </div>
+                      <p className="text-xs font-bold text-white truncate">{c.name}</p>
+                      
+                      <label className="block cursor-pointer">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-semibold transition-colors">
+                          <i className="fa-solid fa-cloud-arrow-up"></i>
+                          <span>ছবি বদলান</span>
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = (uploadEvent) => {
+                                updateCampusImage(c.id, uploadEvent.target.result);
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-3 bg-slate-800/80 border-t border-slate-700 text-right">
+              <button
+                onClick={() => setShowImageGuideModal(false)}
+                className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-all shadow-md"
+              >
+                বুঝেছি, ধন্যবাদ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Render React App
+const rootElement = document.getElementById("root");
+const root = ReactDOM.createRoot(rootElement);
+root.render(<App />);

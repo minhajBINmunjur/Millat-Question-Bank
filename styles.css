@@ -1,0 +1,209 @@
+/* Modern Custom Styles for Millat Question Bank */
+
+@layer utilities {
+  .glass-card {
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .glass-light {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+  }
+
+  .glass-card-hover {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .glass-card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px 2px rgba(16, 185, 129, 0.25);
+  }
+}
+
+/* Custom Styled Headers matching Mockups */
+.exam-header-banner {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.75rem 0.5rem 1.25rem;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 28px;
+  border-bottom-right-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.banner-blue {
+  background: linear-gradient(135deg, #090e23 0%, #1e3a8a 60%, #3b82f6 100%);
+  color: #eff6ff;
+  border-top: 1px solid #60a5fa;
+  border-left: 1px solid #60a5fa;
+}
+
+.banner-orange {
+  background: linear-gradient(135deg, #e11d48 0%, #ea580c 60%, #f97316 100%);
+  color: #fff7ed;
+  border-top: 1px solid #fdba74;
+  border-left: 1px solid #fdba74;
+}
+
+.banner-dark {
+  background: linear-gradient(135deg, #020617 0%, #1e293b 60%, #475569 100%);
+  color: #f8fafc;
+  border-top: 1px solid #94a3b8;
+  border-left: 1px solid #94a3b8;
+}
+
+.banner-gold {
+  background: linear-gradient(135deg, #241400 0%, #854d0e 60%, #d97706 100%);
+  color: #fefce8;
+  border-top: 1px solid #fde047;
+  border-left: 1px solid #fde047;
+}
+
+/* Year Pill Buttons */
+.year-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 82px;
+  padding: 0.5rem 1.15rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 1.05rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  user-select: none;
+}
+
+.year-pill-blue {
+  background: rgba(30, 58, 138, 0.15);
+  border: 1.5px solid #3b82f6;
+  color: #bfdbfe;
+}
+.year-pill-blue:hover {
+  background: #2563eb;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.4);
+}
+
+.year-pill-orange {
+  background: rgba(234, 88, 12, 0.15);
+  border: 1.5px solid #ea580c;
+  color: #fed7aa;
+}
+.year-pill-orange:hover {
+  background: #ea580c;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(234, 88, 12, 0.4);
+}
+
+.year-pill-dark {
+  background: rgba(71, 85, 105, 0.15);
+  border: 1.5px solid #64748b;
+  color: #e2e8f0;
+}
+.year-pill-dark:hover {
+  background: #334155;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(51, 65, 85, 0.4);
+}
+
+.year-pill-gold {
+  background: rgba(202, 138, 4, 0.15);
+  border: 1.5px solid #ca8a04;
+  color: #fef08a;
+}
+.year-pill-gold:hover {
+  background: #ca8a04;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(202, 138, 4, 0.4);
+}
+
+/* Subject Buttons */
+.subject-btn {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1.5px solid rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+  padding: 0.65rem 1.4rem;
+  font-weight: 500;
+  font-size: 0.98rem;
+  color: #f1f5f9;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.subject-btn:hover {
+  background: #10b981;
+  border-color: #34d399;
+  color: #ffffff;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 18px rgba(16, 185, 129, 0.35);
+}
+
+/* Modal animation */
+.modal-enter {
+  animation: modalFadeIn 0.25s ease-out forwards;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Background image overlay container */
+.campus-bg-container {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: background-image 0.4s ease-in-out;
+}
+
+.campus-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(2, 6, 23, 0.82) 0%,
+    rgba(15, 23, 42, 0.90) 60%,
+    rgba(2, 6, 23, 0.96) 100%
+  );
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0b1120;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
