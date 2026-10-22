@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS (pre-built, minified) -->
-  <link rel="stylesheet" href="tailwind.css?v=2" />
+  <link rel="stylesheet" href="tailwind.css?v=3" />
   <link rel="preload" as="image" href="images/hero.webp" type="image/webp" fetchpriority="high" />
   
   <!-- Font Awesome Icons -->
@@ -258,16 +258,16 @@
     <!-- =========================================================
          PAGE 1: CAMPUS SELECTION
          ========================================================= -->
-    <section id="page-campuses" class="space-y-6">
+    <section id="page-campuses" class="space-y-4">
       
       <!-- Hero Header Box with Green Border (Cleaned of extra badges per screenshot) -->
-      <div class="relative overflow-hidden rounded-3xl border-2 border-emerald-500/70 bg-gradient-to-r from-slate-900 via-slate-900/90 to-emerald-950/40 shadow-2xl p-4 sm:p-5 lg:p-6 transition-all hover:border-emerald-400">
+      <div class="relative overflow-hidden rounded-3xl border-2 border-emerald-500/70 bg-gradient-to-r from-slate-900 via-slate-900/90 to-emerald-950/40 shadow-2xl p-3 sm:p-3 lg:p-4 transition-all hover:border-emerald-400">
         <div class="absolute -right-16 -top-16 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-5">
+        <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-4">
           
           <!-- Left: Title, Subtitle & Search -->
-          <div class="space-y-4 max-w-xl text-center lg:text-left flex-1">
-            <h2 class="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-none font-sans">
+          <div class="space-y-2 max-w-xl text-center lg:text-left flex-1">
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-none font-sans">
               Millat Question Bank
             </h2>
 
@@ -275,22 +275,10 @@
               তা'মীরুল মিল্লাত কামিল মাদ্রাসার সকল ক্যাম্পাস, আলিম ও দাখিল শ্রেণির বিগত বছরের পরীক্ষার প্রশ্নপত্রের এক অনন্য ডিজিটাল সংগ্রহশালা।
             </p>
 
-            <!-- Search input inside box -->
-            <div class="pt-2 max-w-md mx-auto lg:mx-0">
-              <div class="relative">
-                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400 text-sm"></i>
-                <input
-                  type="text"
-                  placeholder="Search Courses, Subjects, Years..."
-                  oninput="handleSearch(this.value)"
-                  class="w-full bg-slate-950/90 border-2 border-emerald-500/50 rounded-2xl pl-11 pr-4 py-3 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 transition-all shadow-lg"
-                />
-              </div>
-            </div>
           </div>
 
           <!-- Right: Campus Building Photo (Badges removed per user screenshot) -->
-          <div class="w-full lg:w-[440px] h-44 sm:h-52 lg:h-56 rounded-2xl overflow-hidden border-2 border-emerald-400/60 shadow-2xl relative group flex-shrink-0">
+          <div class="w-full lg:w-[280px] h-32 sm:h-32 lg:h-32 rounded-2xl overflow-hidden border-2 border-emerald-400/60 shadow-2xl relative group flex-shrink-0">
             <img class="w-full h-full object-cover" width="1024" height="604" alt="" fetchpriority="high" decoding="async"
               src="images/hero.webp" />
           </div>
@@ -316,13 +304,13 @@
           onclick="selectCampus('tongi')"
           class="group relative cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-800 hover:border-emerald-500 bg-slate-900/80 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/20 flex flex-col"
         >
-          <div class="relative h-56 sm:h-64 w-full overflow-hidden bg-slate-950">
+          <div class="relative h-28 sm:h-28 w-full overflow-hidden bg-slate-950">
             <img class="w-full h-full object-cover" width="1024" height="752" alt="" loading="lazy" decoding="async"
               src="images/tongi.webp" />
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
           </div>
 
-          <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+          <div class="p-3 flex-1 flex flex-col justify-between space-y-2">
             <div>
               <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">
                 Tamirul Millat Kamil Madrasah, Tongi
@@ -332,7 +320,7 @@
               </p>
             </div>
 
-            <button class="w-full py-2.5 px-4 rounded-xl bg-slate-800 group-hover:bg-emerald-600 text-slate-200 group-hover:text-white font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm font-bangla">
+            <button class="w-full py-1.5 px-4 rounded-xl bg-slate-800 group-hover:bg-emerald-600 text-slate-200 group-hover:text-white font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm font-bangla">
               <span>এই ক্যাম্পাস নির্বাচন করো</span>
               <i class="fa-solid fa-arrow-right-long text-xs group-hover:translate-x-1 transition-transform"></i>
             </button>
@@ -344,13 +332,13 @@
           onclick="selectCampus('mohila')"
           class="group relative cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-800 hover:border-emerald-500 bg-slate-900/80 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/20 flex flex-col"
         >
-          <div class="relative h-56 sm:h-64 w-full overflow-hidden bg-slate-950">
+          <div class="relative h-28 sm:h-28 w-full overflow-hidden bg-slate-950">
             <img class="w-full h-full object-cover" width="1024" height="537" alt="" loading="lazy" decoding="async"
               src="images/mohila.webp" />
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
           </div>
 
-          <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+          <div class="p-3 flex-1 flex flex-col justify-between space-y-2">
             <div>
               <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">
                 Tamirul Millat Mohila Kamil Madrasah
@@ -360,7 +348,7 @@
               </p>
             </div>
 
-            <button class="w-full py-2.5 px-4 rounded-xl bg-slate-800 group-hover:bg-emerald-600 text-slate-200 group-hover:text-white font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm font-bangla">
+            <button class="w-full py-1.5 px-4 rounded-xl bg-slate-800 group-hover:bg-emerald-600 text-slate-200 group-hover:text-white font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm font-bangla">
               <span>এই ক্যাম্পাস নির্বাচন করো</span>
               <i class="fa-solid fa-arrow-right-long text-xs group-hover:translate-x-1 transition-transform"></i>
             </button>
@@ -372,13 +360,13 @@
           onclick="selectCampus('dhaka')"
           class="group relative cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-800 hover:border-emerald-500 bg-slate-900/80 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/20 flex flex-col"
         >
-          <div class="relative h-56 sm:h-64 w-full overflow-hidden bg-slate-950">
+          <div class="relative h-28 sm:h-28 w-full overflow-hidden bg-slate-950">
             <img class="w-full h-full object-cover" width="1024" height="537" alt="" loading="lazy" decoding="async"
               src="images/dhaka.webp" />
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
           </div>
 
-          <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+          <div class="p-3 flex-1 flex flex-col justify-between space-y-2">
             <div>
               <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">
                 Tamirul Millat Kamil Madrasah Dhaka
@@ -388,7 +376,7 @@
               </p>
             </div>
 
-            <button class="w-full py-2.5 px-4 rounded-xl bg-slate-800 group-hover:bg-emerald-600 text-slate-200 group-hover:text-white font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm font-bangla">
+            <button class="w-full py-1.5 px-4 rounded-xl bg-slate-800 group-hover:bg-emerald-600 text-slate-200 group-hover:text-white font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm font-bangla">
               <span>এই ক্যাম্পাস নির্বাচন করো</span>
               <i class="fa-solid fa-arrow-right-long text-xs group-hover:translate-x-1 transition-transform"></i>
             </button>
@@ -638,7 +626,7 @@
 
       <div class="p-10 bg-slate-950/60 text-center">
         <i class="fa-solid fa-file-circle-question text-4xl text-slate-600 mb-3"></i>
-        <p class="text-sm text-slate-400 font-bangla">এই প্রশ্নপত্রটি শীঘ্রই যুক্ত করা হবে।</p>
+        <p class="text-sm text-slate-400 font-bangla">প্রশ্ন না পাঠাইলে যুক্ত করব কিভাবে ??</p>
       </div>
     </div>
   </div>
