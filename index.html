@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Millat Question Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&family=Noto+Serif+Bengali:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f7f5;--surface:#ffffff;--ink:#14231d;--muted:#55665e;--line:#c9d6cf;
+  --brand:#0f5b46;--on-brand:#ffffff;--accent:#c98a00;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1714;--surface:#17221d;--ink:#e6efe9;--muted:#9db0a6;--line:#2b3b34;
+    --brand:#4cc29a;--on-brand:#08211a;--accent:#e5b53c;color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1714;--surface:#17221d;--ink:#e6efe9;--muted:#9db0a6;--line:#2b3b34;
+  --brand:#4cc29a;--on-brand:#08211a;--accent:#e5b53c;color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hind Siliguri","Noto Sans Bengali","Segoe UI",Arial,sans-serif;font-size:1.05rem;line-height:1.6}
+.wrap{max-width:980px;margin:0 auto;padding:0 1.25rem}
+header{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.1rem 0;border-bottom:1px solid var(--line)}
+.brand{font-family:"Noto Serif Bengali",Georgia,serif;font-weight:800;font-size:1.25rem;color:var(--ink);text-decoration:none}
+.brand span{color:var(--brand)}
+.theme{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;width:2.5rem;height:2.5rem;font-size:1.1rem;cursor:pointer}
+a:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{padding:2rem 0 3rem;min-height:70vh}
+h1{font-family:"Noto Serif Bengali",Georgia,serif;font-weight:800;line-height:1.25;margin:0 0 .4rem;font-size:clamp(1.8rem,5vw,2.6rem)}
+.lead{color:var(--muted);margin:0 0 2rem;max-width:60ch}
+.level{margin-bottom:2.5rem}
+.level h2{font-family:"Noto Serif Bengali",Georgia,serif;font-weight:800;font-size:clamp(2rem,6vw,3.2rem);line-height:1.2;margin:0}
+.level h2::after{content:"";display:block;width:3.2rem;height:4px;background:var(--accent);margin:.5rem 0 1.4rem;border-radius:2px}
+.classes{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem 2rem}
+.cls h3{margin:0 0 .7rem;font-size:1.05rem;font-weight:600;color:var(--muted)}
+.subjects{display:flex;flex-wrap:wrap;gap:.6rem}
+.btn{display:inline-flex;align-items:center;padding:.65rem 1.1rem;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;font-weight:600;text-decoration:none;cursor:pointer}
+.btn:hover{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.btn.solid{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.btn.solid:hover{filter:brightness(1.08)}
+.btn[aria-disabled="true"]{opacity:.45;pointer-events:none}
+.crumbs{display:flex;flex-wrap:wrap;gap:.4rem;margin:0 0 1.2rem;font-size:.98rem;color:var(--muted)}
+.crumbs a{color:var(--brand);text-decoration:none;font-weight:600}
+.crumbs a:hover{text-decoration:underline}
+.years{display:flex;flex-wrap:wrap;gap:.9rem;margin-top:1.4rem}
+.year{min-width:6rem;text-align:center;padding:1rem 1.3rem;border:2px solid var(--brand);border-radius:8px;background:var(--surface);color:var(--ink);font-family:"Noto Serif Bengali",Georgia,serif;font-weight:800;font-size:1.4rem;text-decoration:none}
+.year:hover{background:var(--brand);color:var(--on-brand)}
+.actions{display:flex;flex-wrap:wrap;gap:.7rem;margin:1.2rem 0}
+.viewer iframe{display:block;width:100%;height:75vh;border:1px solid var(--line);border-radius:10px;background:#fff}
+.empty{border:2px dashed var(--line);border-radius:10px;padding:2.5rem 1.5rem;text-align:center;color:var(--muted);background:var(--surface)}
+.empty strong{display:block;color:var(--ink);font-size:1.15rem;margin-bottom:.3rem}
+footer{border-top:1px solid var(--line);padding:1.2rem 0;color:var(--muted);font-size:.92rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="brand" href="#home">Millat <span>Question Bank</span></a>
+    <button class="theme" id="theme" aria-label="থিম বদলান">🌙</button>
+  </header>
+  <main id="app"></main>
+  <footer>Millat Question Bank</footer>
+</div>
+
+<script>
+/* ===== এখানে নিজের তথ্য বদলান =====
+   গঠন: স্তর → শ্রেণি → টার্ম → বিষয় → বছর (সবই নমুনা)
+   টার্মের নাম ও বিষয়ের তালিকা নিজের মতো বদলান।
+   PAPERS: PDF ফাইলের পথ, চাবির গঠন 'শ্রেণি/টার্ম/বিষয়/বছর'
+   যেমন PAPERS['alim1/t1/chem/2016'] = 'papers/alim1-t1-chem-2016.pdf'
+   (ফাইল না দিলে "PDF এখনো যোগ করা হয়নি" দেখাবে) */
+const terms = subjects => [
+  { id:'t1', name:'প্রথম সাময়িক', subjects },
+  { id:'t2', name:'দ্বিতীয় সাময়িক', subjects },
+  { id:'t3', name:'বার্ষিক', subjects }
+];
+const alimSubjects = [
+  { id:'chem', name:'রসায়ন', years:[2016,2017,2018,2019,2020] },
+  { id:'phys', name:'পদার্থবিজ্ঞান', years:[2018,2020] },
+  { id:'bio',  name:'জীববিজ্ঞান', years:[2022,2023] }
+];
+const dakhilSubjects = [
+  { id:'bangla', name:'বাংলা', years:[2021,2022,2023] },
+  { id:'eng',    name:'ইংরেজি', years:[2022,2023] },
+  { id:'math',   name:'গণিত', years:[2020,2021,2023] }
+];
+const LEVELS = [
+  { id:'alim', name:'আলিম', classes:[
+    { id:'alim1', name:'১ম বর্ষ', terms: terms(alimSubjects) },
+    { id:'alim2', name:'২য় বর্ষ', terms: terms(alimSubjects) } ] },
+  { id:'dakhil', name:'দাখিল', classes:[
+    { id:'d9',  name:'৯ম শ্রেণি',  terms: terms(dakhilSubjects) },
+    { id:'d10', name:'১০ম শ্রেণি', terms: terms(dakhilSubjects) } ] }
+];
+const PAPERS = {};
+
+const app = document.getElementById('app');
+const bn = s => String(s).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+
+function find(cls, term, subj){
+  const L = LEVELS.find(l => l.classes.some(c => c.id === cls));
+  const C = L && L.classes.find(c => c.id === cls);
+  const T = C && term && C.terms.find(t => t.id === term);
+  const S = T && subj && T.subjects.find(s => s.id === subj);
+  return { L, C, T, S };
+}
+const trail = (L, C, T, S, last) => {
+  const parts = [`<a href="#home">হোম</a>`, L.name, C.name];
+  if(T) parts.push(last === 'T' ? T.name : `<a href="#t-${C.id}-${T.id}">${T.name}</a>`);
+  if(S) parts.push(last === 'S' ? S.name : `<a href="#y-${C.id}-${T.id}-${S.id}">${S.name}</a>`);
+  return `<nav class="crumbs">${parts.join(' › ')}</nav>`;
+};
+
+function home(){
+  document.title = 'Millat Question Bank';
+  return `<h1>শ্রেণি বেছে নিন</h1>
+  <p class="lead">নিজের শ্রেণির টার্মে ক্লিক করুন, তারপর বিষয় ও বছর বেছে প্রশ্নপত্র দেখুন বা ডাউনলোড করুন।</p>` +
+  LEVELS.map(L => `<section class="level"><h2>${L.name}</h2><div class="classes">` +
+    L.classes.map(C => `<div class="cls"><h3>${C.name}</h3><div class="subjects">` +
+      C.terms.map(T => `<a class="btn" href="#t-${C.id}-${T.id}">${T.name}</a>`).join('') +
+    `</div></div>`).join('') + `</div></section>`).join('');
+}
+
+function termPage(cls, term){
+  const { L, C, T } = find(cls, term);
+  if(!T) return notFound();
+  document.title = `${T.name} – Millat Question Bank`;
+  return trail(L, C, T, null, 'T') + `<h1>${T.name}</h1>
+  <p class="lead">${L.name}, ${C.name}। বিষয় বেছে নিন।</p>
+  <div class="subjects">${T.subjects.map(S => `<a class="btn" href="#y-${C.id}-${T.id}-${S.id}">${S.name}</a>`).join('')}</div>`;
+}
+
+function yearsPage(cls, term, subj){
+  const { L, C, T, S } = find(cls, term, subj);
+  if(!S) return notFound();
+  document.title = `${S.name} – Millat Question Bank`;
+  const years = [...S.years].sort((a,b) => b - a);
+  return trail(L, C, T, S, 'S') + `<h1>${S.name}</h1>
+  <p class="lead">${C.name}, ${T.name}। বছর বেছে নিন।</p>
+  <div class="years">${years.map(y => `<a class="year" href="#p-${C.id}-${T.id}-${S.id}-${y}">${bn(y)}</a>`).join('')}</div>`;
+}
+
+function paperPage(cls, term, subj, year){
+  const { L, C, T, S } = find(cls, term, subj);
+  if(!S || !S.years.includes(Number(year))) return notFound();
+  document.title = `${S.name} ${bn(year)} – Millat Question Bank`;
+  const file = PAPERS[`${cls}/${term}/${subj}/${year}`];
+  const nav = trail(L, C, T, S, '') .replace('</nav>', ` › ${bn(year)}</nav>`);
+  if(!file){
+    return nav + `<h1>${S.name} – ${bn(year)}</h1>
+    <div class="actions"><a class="btn solid" aria-disabled="true" href="#p-${cls}-${term}-${subj}-${year}">PDF ডাউনলোড করুন</a></div>
+    <div class="empty"><strong>এই প্রশ্নের PDF এখনো যোগ করা হয়নি।</strong>PDF যোগ হলে এখানে দেখা যাবে এবং ডাউনলোডের বাটনও কাজ করবে।</div>`;
+  }
+  return nav + `<h1>${S.name} – ${bn(year)}</h1>
+  <div class="actions">
+    <a class="btn solid" href="${file}" download>PDF ডাউনলোড করুন</a>
+    <a class="btn" href="${file}" target="_blank" rel="noopener">নতুন ট্যাবে খুলুন</a>
+  </div>
+  <div class="viewer"><iframe src="${file}" title="${S.name} ${bn(year)}"></iframe></div>`;
+}
+
+function notFound(){
+  document.title = 'Millat Question Bank';
+  return `<h1>পাতাটি পাওয়া যায়নি</h1><p class="lead">লিংকটি ঠিক নেই বা পাতাটি সরানো হয়েছে।</p><a class="btn solid" href="#home">হোমে ফিরে যান</a>`;
+}
+
+function render(){
+  const [kind, a, b, c, d] = (location.hash.slice(1) || 'home').split('-');
+  app.innerHTML = kind === 'home' ? home()
+    : kind === 't' ? termPage(a, b)
+    : kind === 'y' ? yearsPage(a, b, c)
+    : kind === 'p' ? paperPage(a, b, c, d)
+    : notFound();
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', render);
+render();
+
+/* থিম */
+const root = document.documentElement;
+function setTheme(t){ root.dataset.theme = t; try{ localStorage.setItem('theme', t); }catch(e){} }
+try{ const t = localStorage.getItem('theme'); if(t) root.dataset.theme = t; }catch(e){}
+document.getElementById('theme').addEventListener('click', () => {
+  const dark = root.dataset.theme === 'dark' || (!root.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+  setTheme(dark ? 'light' : 'dark');
+});
+</script>
+</body>
+</html>
