@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS (pre-built, minified) -->
-  <link rel="stylesheet" href="tailwind.css?v=7" />
+  <link rel="stylesheet" href="tailwind.css?v=8" />
   <link rel="preload" as="image" href="images/hero.webp" type="image/webp" fetchpriority="high" />
   
   <!-- Font Awesome Icons -->
@@ -675,10 +675,7 @@
         </button>
       </div>
 
-      <div class="p-10 bg-slate-950/60 text-center">
-        <i class="fa-solid fa-file-circle-question text-4xl text-slate-600 mb-3"></i>
-        <p class="text-sm text-slate-400 font-bangla">প্রশ্ন না পাঠাইলে যুক্ত করব কিভাবে ??</p>
-      </div>
+      <div id="modal-body"></div>
     </div>
   </div>
 
@@ -875,10 +872,63 @@
       document.getElementById("modal-exam-title").textContent = `পরীক্ষা: ${examType}`;
 
       modal.style.display = "flex";
+      loadPaper(examType, year);
     }
 
     function closeQuestionModal() {
+      paperToken++;
+      document.getElementById("modal-body").innerHTML = "";
       document.getElementById("question-modal").style.display = "none";
+    }
+
+    // ---- PDF lookup: pdfs/<campus>_<subject>_<exam>_<year>.pdf ----
+    const EXAM_SLUGS = {
+      "1st semester/half yearly": "half-yearly",
+      "yearly/year final": "yearly",
+      "pre-test": "pre-test",
+      "test": "test"
+    };
+    const PAPER_EMPTY_HTML =
+      '<div class="p-10 bg-slate-950/60 text-center">' +
+      '<i class="fa-solid fa-file-circle-question text-4xl text-slate-600 mb-3"></i>' +
+      '<p class="text-sm text-slate-400 font-bangla">প্রশ্ন না পাঠাইলে যুক্ত করব কিভাবে ??</p></div>';
+    let paperToken = 0;
+
+    function slugify(t) {
+      return String(t).toLowerCase().replace(/\./g, "").trim().replace(/\s+/g, "-");
+    }
+
+    function pdfPathFor(examType, year) {
+      let sub = slugify(currentSubject || "");
+      if (sub === "ict") sub += "-" + (currentProgram || "alim").toLowerCase();
+      const exam = EXAM_SLUGS[examType] || slugify(examType);
+      const campus = currentCampus ? currentCampus.id : "tongi";
+      return `pdfs/${campus}_${sub}_${exam}_${year}.pdf`;
+    }
+
+    function loadPaper(examType, year) {
+      const body = document.getElementById("modal-body");
+      const token = ++paperToken;
+      const url = pdfPathFor(examType, year);
+      body.innerHTML = '<div class="p-10 bg-slate-950/60 text-center text-sm text-slate-400 font-bangla">খোঁজা হচ্ছে...</div>';
+      fetch(url, { method: "HEAD" })
+        .then((r) => {
+          if (token !== paperToken) return;
+          const isPdf = r.ok && (r.headers.get("content-type") || "").toLowerCase().includes("pdf");
+          body.innerHTML = isPdf ? paperHtml(url) : PAPER_EMPTY_HTML;
+        })
+        .catch(() => {
+          if (token === paperToken) body.innerHTML = PAPER_EMPTY_HTML;
+        });
+    }
+
+    function paperHtml(url) {
+      return '<div class="bg-slate-950/60">' +
+        '<iframe src="' + url + '" title="Question paper" class="w-full h-[70vh] border-0"></iframe>' +
+        '<div class="p-3 flex flex-wrap gap-2 justify-center border-t border-slate-700">' +
+        '<a href="' + url + '" target="_blank" rel="noopener" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-bangla border border-slate-700 transition-colors">নতুন ট্যাবে খোলো</a>' +
+        '<a href="' + url + '" download class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold font-bangla transition-all">ডাউনলোড করো</a>' +
+        '</div></div>';
     }
 
 
