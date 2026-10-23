@@ -288,6 +288,15 @@
       #page-campuses .grid .p-3 { padding: 0.6rem; }
     }
 
+    /* Hide native/default scrollbars on mobile (only the green indicator stays) */
+    @media (max-width: 639.98px) {
+      html, body, * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+      html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar,
+      *::-webkit-scrollbar-track, *::-webkit-scrollbar-thumb {
+        display: none !important; width: 0 !important; height: 0 !important; background: transparent !important;
+      }
+    }
+
     /* 3. Always-visible green scroll indicator (mobile only) */
     #scrollTrack { display: none; }
     @media (max-width: 639.98px) {
