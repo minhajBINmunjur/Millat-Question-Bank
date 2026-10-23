@@ -11,17 +11,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS (pre-built, minified) -->
-  <link rel="stylesheet" href="tailwind.css?v=5" />
+  <link rel="stylesheet" href="tailwind.css?v=6" />
   <link rel="preload" as="image" href="images/hero.webp" type="image/webp" fetchpriority="high" />
   
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
+  <script>try{if(localStorage.getItem("mqb-theme")==="light")document.documentElement.classList.add("light")}catch(e){}</script>
   <style>
     /* Campus card photo: fills the free screen height (no page scroll), up to the full image */
-    .campus-img { height: 12rem; }
+    .campus-img { height: 14rem; }
     @media (min-width: 768px) {
-      .campus-img { height: clamp(128px, calc(100vh - 476px), 260px); }
+      .campus-img { height: clamp(128px, calc(100vh - 492px), 260px); }
     }
 
     .glass-card {
@@ -175,6 +176,46 @@
       }
     }
 
+
+    /* ================= DAY MODE (html.light) ================= */
+    html.light body { background:#f1f5f9; color:#0f172a; }
+    html.light .bg-slate-950 { background-color:#f8fafc; }
+    html.light .bg-slate-950\/85 { background-color:rgba(248,250,252,.9); }
+    html.light .bg-slate-950\/60 { background-color:rgba(241,245,249,.8); }
+    html.light .bg-slate-900 { background-color:#ffffff; }
+    html.light .bg-slate-900\/60, html.light .bg-slate-900\/80 { background-color:rgba(255,255,255,.8); }
+    html.light .bg-slate-800, html.light .bg-slate-800\/90 { background-color:#e2e8f0; }
+    html.light .bg-slate-700\/60 { background-color:#cbd5e1; }
+    html.light .hover\:bg-slate-700:hover { background-color:#cbd5e1; }
+    html.light .text-slate-100, html.light .text-slate-200 { color:#0f172a; }
+    html.light .text-slate-300 { color:#334155; }
+    html.light .text-slate-400 { color:#475569; }
+    html.light .text-slate-500 { color:#64748b; }
+    html.light .text-white { color:#0f172a; }
+    html.light .from-emerald-500.text-white, html.light .bg-emerald-600.text-white { color:#ffffff; }
+    html.light .text-emerald-400, html.light .hover\:text-emerald-400:hover, .group:hover html.light .group-hover\:text-emerald-400 { color:#047857; }
+    html.light .group:hover .group-hover\:text-emerald-400 { color:#047857; }
+    html.light .bg-emerald-600\/20.text-emerald-300 { color:#047857; }
+    html.light .text-cyan-400 { color:#0e7490; }
+    html.light .hover\:text-white:hover { color:#0f172a; }
+    html.light .border-slate-800, html.light .border-slate-800\/80 { border-color:#cbd5e1; }
+    html.light .border-slate-700, html.light .border-slate-700\/60, html.light .border-slate-700\/80 { border-color:#cbd5e1; }
+    html.light .glass-card { background:rgba(255,255,255,.82); border:1px solid rgba(15,23,42,.12); }
+    html.light .subject-btn { background:rgba(255,255,255,.9); border-color:rgba(100,116,139,.4); color:#0f172a; }
+    html.light .subject-btn:hover { background:#10b981; border-color:#34d399; color:#ffffff; }
+    html.light .year-pill-blue { color:#1d4ed8; background:rgba(59,130,246,.1); }
+    html.light .year-pill-orange { color:#c2410c; background:rgba(234,88,12,.1); }
+    html.light .year-pill-dark { color:#334155; background:rgba(71,85,105,.1); }
+    html.light .year-pill-gold { color:#a16207; background:rgba(202,138,4,.12); }
+    html.light .year-pill-blue:hover, html.light .year-pill-orange:hover,
+    html.light .year-pill-dark:hover, html.light .year-pill-gold:hover { color:#ffffff; }
+    html.light #dynamic-backdrop > div { background-image:linear-gradient(to bottom, rgba(241,245,249,.9), rgba(241,245,249,.94), rgba(241,245,249,.97)); }
+    html.light .from-slate-900 { --tw-gradient-from:#ffffff var(--tw-gradient-from-position); --tw-gradient-to:rgb(255 255 255 / 0) var(--tw-gradient-to-position); --tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to); }
+    html.light .via-slate-900\/90 { --tw-gradient-stops:var(--tw-gradient-from), rgb(255 255 255 / .9) var(--tw-gradient-via-position), var(--tw-gradient-to); }
+    html.light .to-emerald-950\/40 { --tw-gradient-to:rgb(209 250 229 / .8) var(--tw-gradient-to-position); }
+    html.light ::-webkit-scrollbar-track { background:#e2e8f0; }
+    html.light ::-webkit-scrollbar-thumb { background:#94a3b8; }
+
     ::-webkit-scrollbar {
       width: 8px;
       height: 8px;
@@ -219,6 +260,14 @@
 
       <!-- Right Action Button: প্রশ্ন পাঠাও (Updated per user instruction) -->
       <div class="flex items-center gap-3">
+        <button
+          id="theme-toggle"
+          onclick="toggleTheme()"
+          aria-label="Day / Night mode"
+          class="w-9 h-9 rounded-lg bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center justify-center transition-all"
+        >
+          <i id="theme-icon" class="fa-solid fa-sun text-sm"></i>
+        </button>
         <button
           onclick="openSubmitQuestionModal()"
           class="px-3.5 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all shadow-sm font-bangla"
@@ -280,7 +329,7 @@
           </div>
 
           <!-- Right: Campus Building Photo (Badges removed per user screenshot) -->
-          <div class="w-full lg:w-[205px] h-24 sm:h-24 lg:h-24 rounded-2xl overflow-hidden border-2 border-emerald-400/60 shadow-2xl relative group flex-shrink-0">
+          <div class="w-full lg:w-[240px] h-44 sm:h-44 lg:h-28 rounded-2xl overflow-hidden border-2 border-emerald-400/60 shadow-2xl relative group flex-shrink-0">
             <img class="w-full h-full object-cover" width="1024" height="604" alt="" fetchpriority="high" decoding="async"
               src="images/hero.webp" />
           </div>
@@ -702,6 +751,19 @@
        JAVASCRIPT APPLICATION ENGINE
        ========================================================= -->
   <script>
+    // Day / Night mode
+    function applyTheme(t) {
+      document.documentElement.classList.toggle("light", t === "light");
+      var ic = document.getElementById("theme-icon");
+      if (ic) ic.className = "fa-solid " + (t === "light" ? "fa-moon" : "fa-sun") + " text-sm";
+    }
+    function toggleTheme() {
+      var t = document.documentElement.classList.contains("light") ? "dark" : "light";
+      applyTheme(t);
+      try { localStorage.setItem("mqb-theme", t); } catch (e) {}
+    }
+    applyTheme(document.documentElement.classList.contains("light") ? "light" : "dark");
+
     // Campus Data with EXACT names specified by User
     const CAMPUS_CONFIG = {
       tongi: {
