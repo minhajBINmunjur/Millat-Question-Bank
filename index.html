@@ -8,6 +8,7 @@
   <!-- Google Fonts: Hind Siliguri (Bangla) & Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS (pre-built, minified) -->
@@ -933,6 +934,14 @@
       '<i class="fa-solid fa-file-circle-question text-4xl text-slate-600 mb-3"></i>' +
       '<p class="text-sm text-slate-400 font-bangla">প্রশ্ন না পাঠাইলে যুক্ত করব কিভাবে ??</p></div>';
     let paperToken = 0;
+    const paperExistsCache = Object.create(null);
+
+    function isPdfResponse(response, url) {
+      if (!response || !response.ok) return false;
+      const type = (response.headers.get("content-type") || "").toLowerCase();
+      if (type.includes("pdf") || type.includes("octet-stream")) return true;
+      return type === "" && String(url).toLowerCase().endsWith(".pdf");
+    }
 
     function slugify(t) {
       return String(t).toLowerCase().replace(/\./g, "").trim().replace(/\s+/g, "-");
@@ -951,14 +960,27 @@
       const token = ++paperToken;
       const url = pdfPathFor(examType, year);
       body.innerHTML = '<div class="p-10 bg-slate-950/60 text-center text-sm text-slate-400 font-bangla">খোঁজা হচ্ছে...</div>';
+
+      const cached = paperExistsCache[url];
+      if (cached === true) {
+        if (token === paperToken) body.innerHTML = paperHtml(url);
+        return;
+      }
+      if (cached === false) {
+        if (token === paperToken) body.innerHTML = PAPER_EMPTY_HTML;
+        return;
+      }
+
       fetch(url, { method: "HEAD" })
         .then((r) => {
           if (token !== paperToken) return;
-          const isPdf = r.ok && (r.headers.get("content-type") || "").toLowerCase().includes("pdf");
+          const isPdf = isPdfResponse(r, url);
+          paperExistsCache[url] = isPdf;
           body.innerHTML = isPdf ? paperHtml(url) : PAPER_EMPTY_HTML;
         })
         .catch(() => {
-          if (token === paperToken) body.innerHTML = PAPER_EMPTY_HTML;
+          if (token !== paperToken) return;
+          body.innerHTML = PAPER_EMPTY_HTML;
         });
     }
 
