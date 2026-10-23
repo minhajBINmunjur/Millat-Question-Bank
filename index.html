@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS (pre-built, minified) -->
-  <link rel="stylesheet" href="tailwind.css?v=8" />
+  <link rel="stylesheet" href="tailwind.css?v=9" />
   <link rel="preload" as="image" href="images/hero.webp" type="image/webp" fetchpriority="high" />
   
   <!-- Font Awesome Icons -->
@@ -936,12 +936,12 @@
     let paperToken = 0;
     const paperExistsCache = Object.create(null);
 
-    function isPdfResponse(response, url) {
-      if (!response || !response.ok) return false;
-      const type = (response.headers.get("content-type") || "").toLowerCase();
-      if (type.includes("pdf") || type.includes("octet-stream")) return true;
-      return type === "" && String(url).toLowerCase().endsWith(".pdf");
-    }
+    // Static manifest avoids a network HEAD request every time a paper is opened.
+    // Add each newly uploaded PDF path here when adding a paper to /pdfs.
+    const AVAILABLE_PAPERS = new Set([
+      "pdfs/tongi_chemistry-2nd_test_2024.pdf",
+      "pdfs/tongi_physics-2nd_test_2024.pdf"
+    ]);
 
     function slugify(t) {
       return String(t).toLowerCase().replace(/\./g, "").trim().replace(/\s+/g, "-");
@@ -962,26 +962,16 @@
       body.innerHTML = '<div class="p-10 bg-slate-950/60 text-center text-sm text-slate-400 font-bangla">খোঁজা হচ্ছে...</div>';
 
       const cached = paperExistsCache[url];
-      if (cached === true) {
-        if (token === paperToken) body.innerHTML = paperHtml(url);
-        return;
-      }
-      if (cached === false) {
-        if (token === paperToken) body.innerHTML = PAPER_EMPTY_HTML;
+      if (cached !== undefined) {
+        if (token === paperToken) body.innerHTML = cached ? paperHtml(url) : PAPER_EMPTY_HTML;
         return;
       }
 
-      fetch(url, { method: "HEAD" })
-        .then((r) => {
-          if (token !== paperToken) return;
-          const isPdf = isPdfResponse(r, url);
-          paperExistsCache[url] = isPdf;
-          body.innerHTML = isPdf ? paperHtml(url) : PAPER_EMPTY_HTML;
-        })
-        .catch(() => {
-          if (token !== paperToken) return;
-          body.innerHTML = PAPER_EMPTY_HTML;
-        });
+      // This site is static: use the known-file manifest instead of waiting for
+      // an extra HEAD request before showing the PDF or the empty-state message.
+      const isAvailable = AVAILABLE_PAPERS.has(url);
+      paperExistsCache[url] = isAvailable;
+      if (token === paperToken) body.innerHTML = isAvailable ? paperHtml(url) : PAPER_EMPTY_HTML;
     }
 
     function paperHtml(url) {
