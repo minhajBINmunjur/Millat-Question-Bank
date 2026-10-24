@@ -991,6 +991,7 @@
     // Add each newly uploaded PDF path here when adding a paper to /pdfs.
     const AVAILABLE_PAPERS = new Set([
       "pdfs/tongi_chemistry-2nd_test_2024.pdf",
+      "pdfs/tongi_math-1st_test_2024.pdf",
       "pdfs/tongi_physics-2nd_test_2024.pdf"
     ]);
 
@@ -1018,11 +1019,23 @@
         return;
       }
 
-      // This site is static: use the known-file manifest instead of waiting for
-      // an extra HEAD request before showing the PDF or the empty-state message.
-      const isAvailable = AVAILABLE_PAPERS.has(url);
-      paperExistsCache[url] = isAvailable;
-      if (token === paperToken) body.innerHTML = isAvailable ? paperHtml(url) : PAPER_EMPTY_HTML;
+      // Known files show instantly; any other file is checked on the server,
+      // so a PDF uploaded to /pdfs works even if it is not in the list above.
+      if (AVAILABLE_PAPERS.has(url)) {
+        paperExistsCache[url] = true;
+        body.innerHTML = paperHtml(url);
+        return;
+      }
+      fetch(url, { method: "HEAD", cache: "no-store" })
+        .then(function (r) {
+          var type = (r.headers.get("content-type") || "").toLowerCase();
+          return r.ok && type.indexOf("pdf") !== -1;
+        })
+        .catch(function () { return false; })
+        .then(function (ok) {
+          paperExistsCache[url] = ok;
+          if (token === paperToken) body.innerHTML = ok ? paperHtml(url) : PAPER_EMPTY_HTML;
+        });
     }
 
     function paperHtml(url) {
