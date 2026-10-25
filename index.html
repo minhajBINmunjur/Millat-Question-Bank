@@ -881,8 +881,17 @@
     let currentCampus = null;
     let currentProgram = null;
     let currentSubject = null;
+    let currentExam = null;
+    let currentYear = null;
+    let restoring = false;
+    let modalPushed = false;
 
     function goToPage(page) {
+      _goToPage(page);
+      syncUrl();
+    }
+
+    function _goToPage(page) {
       const pageCampuses = document.getElementById("page-campuses");
       const pageSubjects = document.getElementById("page-subjects");
       const pageExams = document.getElementById("page-exams");
@@ -967,13 +976,23 @@
       document.getElementById("modal-exam-title").textContent = `পরীক্ষা: ${examType}`;
 
       modal.style.display = "flex";
+      currentExam = examType;
+      currentYear = year;
       loadPaper(examType, year);
+      if (!restoring) { syncUrl(); modalPushed = true; }
     }
 
     function closeQuestionModal() {
       paperToken++;
       document.getElementById("modal-body").innerHTML = "";
       document.getElementById("question-modal").style.display = "none";
+      currentExam = null;
+      currentYear = null;
+      if (!restoring) {
+        if (modalPushed) { modalPushed = false; history.back(); }
+        else syncUrl(true);
+      }
+      modalPushed = false;
     }
 
     // ---- PDF lookup: pdfs/<campus>_<subject>_<exam>_<year>.pdf ----
@@ -1022,6 +1041,66 @@
         updateCampusCounts();
       })
       .catch(function () {});
+
+    // ---- Keep the current page after refresh + make Back button work ----
+    // URL looks like: /#/tongi/Alim/math%201st/test/2024
+    function campusKeyOf(c) {
+      return Object.keys(CAMPUS_CONFIG).find(function (k) { return CAMPUS_CONFIG[k] === c; });
+    }
+    function currentHash() {
+      if (!currentCampus) return "";
+      var parts = [campusKeyOf(currentCampus)];
+      var onExams = document.getElementById("page-exams").style.display === "block";
+      if (onExams && currentProgram && currentSubject) {
+        parts.push(currentProgram, currentSubject);
+        if (document.getElementById("question-modal").style.display === "flex" && currentExam && currentYear) {
+          parts.push(currentExam, currentYear);
+        }
+      }
+      return "#/" + parts.map(encodeURIComponent).join("/");
+    }
+    function syncUrl(replace) {
+      if (restoring) return;
+      var h = currentHash();
+      if (location.hash === h || (h === "" && location.hash === "")) return;
+      var url = location.pathname + location.search + h;
+      if (replace) history.replaceState(null, "", url);
+      else history.pushState(null, "", url);
+    }
+    function validSubjects() {
+      var set = {};
+      document.querySelectorAll(".subject-btn").forEach(function (b) {
+        var m = /selectSubject\('([^']+)',\s*'([^']+)'\)/.exec(b.getAttribute("onclick") || "");
+        if (m) set[m[1] + "|" + m[2]] = true;
+      });
+      return set;
+    }
+    function applyHash() {
+      restoring = true;
+      try {
+        var parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean).map(function (x) {
+          try { return decodeURIComponent(x); } catch (e) { return ""; }
+        });
+        closeQuestionModal();
+        if (!parts[0] || !CAMPUS_CONFIG[parts[0]]) { _goToPage("campuses"); return; }
+        currentCampus = CAMPUS_CONFIG[parts[0]];
+        var subs = validSubjects();
+        if (parts[1] && parts[2] && subs[parts[1] + "|" + parts[2]]) {
+          currentProgram = parts[1];
+          currentSubject = parts[2];
+          _goToPage("exams");
+          if (parts[3] && parts[4] && EXAM_SLUGS[parts[3]] && /^\d{4}$/.test(parts[4])) {
+            openQuestionModal(parts[3], parts[4]);
+          }
+        } else {
+          _goToPage("subjects");
+        }
+      } finally {
+        restoring = false;
+      }
+    }
+    window.addEventListener("popstate", applyHash);
+    if (location.hash) applyHash();
 
     function slugify(t) {
       return String(t).toLowerCase().replace(/\./g, "").trim().replace(/\s+/g, "-");
