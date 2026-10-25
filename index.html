@@ -9,14 +9,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Anek+Bangla:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"></noscript>
+
   <!-- Tailwind CSS (pre-built, minified) -->
   <link rel="stylesheet" href="tailwind.css?v=9" />
   <link rel="preload" as="image" href="images/hero.webp" type="image/webp" fetchpriority="high" />
   
   <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
 
   <script>try{if(localStorage.getItem("mqb-theme")==="light")document.documentElement.classList.add("light")}catch(e){}</script>
   <style>
@@ -274,9 +276,9 @@
 
     /* Bangla font: Anek Bangla (Latin text keeps Plus Jakarta Sans) */
     html body, .font-bangla {
-      font-family: "Plus Jakarta Sans", "Anek Bangla", "Hind Siliguri", sans-serif !important;
+      font-family: "Plus Jakarta Sans", "Anek Bangla", sans-serif !important;
     }
-    .font-bangla { font-family: "Anek Bangla", "Hind Siliguri", "Plus Jakarta Sans", sans-serif !important; }
+    .font-bangla { font-family: "Anek Bangla", "Plus Jakarta Sans", sans-serif !important; }
 
     /* ===== MOBILE WEB ONLY (desktop unchanged) ===== */
     @media (max-width: 639.98px) {
@@ -454,7 +456,7 @@
           class="group relative cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-800 hover:border-emerald-500 bg-slate-900/80 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/20 flex flex-col"
         >
           <div class="relative campus-img w-full overflow-hidden bg-slate-950">
-            <img class="w-full h-full object-cover" width="1024" height="752" alt="" loading="lazy" decoding="async"
+            <img class="w-full h-full object-cover" width="1024" height="752" alt="" decoding="async"
               src="images/tongi.webp" />
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
           </div>
@@ -1151,10 +1153,16 @@
       thumb.style.height = thumbH + "px";
       thumb.style.top = Math.min(Math.max(top, 0), trackH - thumbH) + "px";
     }
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    window.addEventListener("load", update);
-    setInterval(update, 400);
+    var ticking = false;
+    function schedule() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () { ticking = false; update(); });
+    }
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    window.addEventListener("load", schedule);
+    if (window.ResizeObserver) new ResizeObserver(schedule).observe(document.body);
     update();
   })();
   </script>
