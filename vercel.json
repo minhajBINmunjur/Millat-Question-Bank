@@ -1,5 +1,19 @@
 {
   "functions": {
     "api/papers.js": { "includeFiles": "pdfs/**" }
-  }
+  },
+  "headers": [
+    {
+      "source": "/images/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, stale-while-revalidate=86400" }]
+    },
+    {
+      "source": "/(tailwind\\.css|styles\\.css)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=86400" }]
+    },
+    {
+      "source": "/pdfs/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600, stale-while-revalidate=86400" }]
+    }
+  ]
 }
