@@ -458,9 +458,7 @@
               <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">
                 Tamirul Millat Kamil Madrasah, Tongi
               </h3>
-              <p class="text-xs text-slate-400 font-bangla mt-1">
-                তা'মীরুল মিল্লাত কামিল মাদ্রাসা, টঙ্গী
-              </p>
+              <p class="text-xs text-slate-400 font-bangla mt-1 campus-count" data-campus="tongi">মোট ০ টি প্রশ্ন upload আছে</p>
             </div>
 
             <button class="w-full py-1.5 px-4 rounded-xl bg-slate-800 group-hover:bg-emerald-600 text-slate-200 group-hover:text-white font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm font-bangla">
@@ -486,9 +484,7 @@
               <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">
                 Tamirul Millat Mohila Kamil Madrasah
               </h3>
-              <p class="text-xs text-slate-400 font-bangla mt-1">
-                তা'মীরুল মিল্লাত মহিলা কামিল মাদ্রাসা
-              </p>
+              <p class="text-xs text-slate-400 font-bangla mt-1 campus-count" data-campus="mohila">মোট ০ টি প্রশ্ন upload আছে</p>
             </div>
 
             <button class="w-full py-1.5 px-4 rounded-xl bg-slate-800 group-hover:bg-emerald-600 text-slate-200 group-hover:text-white font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm font-bangla">
@@ -514,9 +510,7 @@
               <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">
                 Tamirul Millat Kamil Madrasah Dhaka
               </h3>
-              <p class="text-xs text-slate-400 font-bangla mt-1">
-                তা'মীরুল মিল্লাত কামিল মাদ্রাসা, ঢাকা (যাত্রাবাড়ী)
-              </p>
+              <p class="text-xs text-slate-400 font-bangla mt-1 campus-count" data-campus="dhaka">মোট ০ টি প্রশ্ন upload আছে</p>
             </div>
 
             <button class="w-full py-1.5 px-4 rounded-xl bg-slate-800 group-hover:bg-emerald-600 text-slate-200 group-hover:text-white font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm font-bangla">
@@ -996,6 +990,31 @@
       "pdfs/tongi_physics-2nd_test_2024.pdf"
     ]);
 
+    // ---- Auto question count per campus (shown on the campus cards) ----
+    const PAPER_NAME_RE = /^pdfs\/(tongi|mohila|dhaka)_[a-z0-9-]+_[a-z0-9-]+_\d{4}\.pdf$/;
+    function toBnDigits(n) {
+      return String(n).replace(/\d/g, function (d) { return "০১২৩৪৫৬৭৮৯"[d]; });
+    }
+    function updateCampusCounts() {
+      var counts = { tongi: 0, mohila: 0, dhaka: 0 };
+      AVAILABLE_PAPERS.forEach(function (path) {
+        var m = PAPER_NAME_RE.exec(path);
+        if (m) counts[m[1]]++;
+      });
+      document.querySelectorAll(".campus-count").forEach(function (el) {
+        el.textContent = "মোট " + toBnDigits(counts[el.dataset.campus] || 0) + " টি প্রশ্ন upload আছে";
+      });
+    }
+    updateCampusCounts();
+    // Ask the server for the real list of PDFs in /pdfs (api/papers.js); falls back to the list above
+    fetch("/api/papers", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+      .then(function (data) {
+        (data.files || []).forEach(function (name) { AVAILABLE_PAPERS.add("pdfs/" + name); });
+        updateCampusCounts();
+      })
+      .catch(function () {});
+
     function slugify(t) {
       return String(t).toLowerCase().replace(/\./g, "").trim().replace(/\s+/g, "-");
     }
@@ -1027,10 +1046,15 @@
         body.innerHTML = paperHtml(url);
         return;
       }
+      function looksLikePdf(r) {
+        var type = (r.headers.get("content-type") || "").toLowerCase();
+        return r.ok && type.indexOf("text/html") === -1;
+      }
       fetch(url, { method: "HEAD", cache: "no-store" })
         .then(function (r) {
-          var type = (r.headers.get("content-type") || "").toLowerCase();
-          return r.ok && type.indexOf("pdf") !== -1;
+          if (looksLikePdf(r)) return true;
+          // Some hosts answer HEAD badly, so double-check with a tiny GET
+          return fetch(url, { headers: { Range: "bytes=0-4" }, cache: "no-store" }).then(looksLikePdf);
         })
         .catch(function () { return false; })
         .then(function (ok) {
