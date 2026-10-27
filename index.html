@@ -671,6 +671,11 @@
         </button>
       </div>
 
+      <div id="no-papers-msg" style="display: none;" class="p-10 rounded-2xl glass-card border border-slate-700/80 text-center">
+        <i class="fa-solid fa-file-circle-question text-4xl text-slate-600 mb-3"></i>
+        <p class="text-sm sm:text-base text-slate-300 font-bangla">এই বিষয়ের কোনো প্রশ্ন এখনো upload করা হয়নি।</p>
+      </div>
+
       <!-- 4 Stylized Exam Sections -->
       <div class="space-y-6">
         
@@ -901,6 +906,7 @@
 
     function goToPage(page) {
       _goToPage(page);
+      if (page === "exams") updateYearButtons();
       syncUrl();
     }
 
@@ -1051,9 +1057,60 @@
       .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
       .then(function (data) {
         (data.files || []).forEach(function (name) { AVAILABLE_PAPERS.add("pdfs/" + name); });
+        apiState = "ok";
         updateCampusCounts();
+        updateYearButtons();
       })
-      .catch(function () {});
+      .catch(function () {
+        apiState = "failed";
+        updateYearButtons();
+      });
+
+    // ---- Show only the year buttons that have an uploaded PDF ----
+    var apiState = "pending";
+    var paperProbing = {};
+    function probePaper(url) {
+      function ok(r) {
+        var type = (r.headers.get("content-type") || "").toLowerCase();
+        return r.ok && type.indexOf("text/html") === -1;
+      }
+      return fetch(url, { method: "HEAD", cache: "no-store" })
+        .then(function (r) {
+          if (ok(r)) return true;
+          return fetch(url, { headers: { Range: "bytes=0-4" }, cache: "no-store" }).then(ok);
+        })
+        .catch(function () { return false; });
+    }
+    function updateYearButtons() {
+      var page = document.getElementById("page-exams");
+      if (!page || !currentSubject) return;
+      var visibleCount = 0, probes = 0;
+      page.querySelectorAll(".year-pill-btn").forEach(function (btn) {
+        var m = /openQuestionModal\('([^']+)',\s*'(\d{4})'\)/.exec(btn.getAttribute("onclick") || "");
+        if (!m) return;
+        var url = pdfPathFor(m[1], m[2]);
+        var show = AVAILABLE_PAPERS.has(url) || paperExistsCache[url] === true;
+        if (!show && apiState === "failed" && paperExistsCache[url] === undefined) {
+          probes++;
+          if (!paperProbing[url]) {
+            paperProbing[url] = true;
+            probePaper(url).then(function (found) {
+              paperExistsCache[url] = found;
+              updateYearButtons();
+            });
+          }
+        }
+        btn.style.display = show ? "" : "none";
+        if (show) visibleCount++;
+      });
+      page.querySelectorAll(".year-grid").forEach(function (grid) {
+        var any = Array.prototype.some.call(grid.children, function (b) { return b.style.display !== "none"; });
+        var box = grid.closest(".rounded-2xl");
+        if (box) box.style.display = any ? "" : "none";
+      });
+      var settled = apiState !== "pending" && !Object.keys(paperProbing).some(function (u) { return paperExistsCache[u] === undefined; });
+      document.getElementById("no-papers-msg").style.display = settled && visibleCount === 0 ? "" : "none";
+    }
 
     // ---- Keep the current page after refresh + make Back button work ----
     // URL looks like: /#/tongi/Alim/math%201st/test/2024
@@ -1102,6 +1159,7 @@
           currentProgram = parts[1];
           currentSubject = parts[2];
           _goToPage("exams");
+          updateYearButtons();
           if (parts[3] && parts[4] && EXAM_SLUGS[parts[3]] && /^\d{4}$/.test(parts[4])) {
             openQuestionModal(parts[3], parts[4]);
           }
