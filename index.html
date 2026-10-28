@@ -287,6 +287,42 @@
       padding: 0.5rem 0;
     }
 
+    /* Floating share buttons (right edge, a little below the middle) */
+    #shareBar {
+      position: fixed;
+      right: 12px;
+      top: 60%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 35;
+    }
+    #shareBar button {
+      width: 38px; height: 38px;
+      border: 0; border-radius: 11px;
+      color: #fff; font-size: 19px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
+      opacity: 0.92;
+      transition: transform .15s ease, opacity .15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #shareBar button:hover, #shareBar button:active { transform: scale(1.1); opacity: 1; }
+    #shareBar .sh-msn { background: linear-gradient(135deg, #00b2ff, #006aff 60%, #a033ff); }
+    #shareBar .sh-wa  { background: #25d366; }
+    #shareBar .sh-tg  { background: #229ed9; }
+    #shareToast {
+      position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95); color: #fff; font-size: 14px;
+      padding: 10px 16px; border-radius: 10px; z-index: 60; display: none;
+    }
+    @media (min-width: 640px) {
+      #shareBar { right: 16px; }
+      #shareBar button { width: 44px; height: 44px; font-size: 22px; }
+    }
+
     /* Bangla font: Anek Bangla (Latin text keeps Plus Jakarta Sans) */
     html body, .font-bangla {
       font-family: "Plus Jakarta Sans", "Anek Bangla", sans-serif !important;
@@ -1283,6 +1319,55 @@
         }
       }
     }
+  </script>
+
+  <!-- Share buttons -->
+  <div id="shareBar" aria-label="Share">
+    <button type="button" class="sh-msn" data-s="msn" aria-label="Messenger এ শেয়ার করো" title="Messenger"><i class="fa-brands fa-facebook-messenger"></i></button>
+    <button type="button" class="sh-wa" data-s="wa" aria-label="WhatsApp এ শেয়ার করো" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></button>
+    <button type="button" class="sh-tg" data-s="tg" aria-label="Telegram এ শেয়ার করো" title="Telegram"><i class="fa-brands fa-telegram"></i></button>
+  </div>
+  <div id="shareToast" role="status"></div>
+  <script>
+  (function () {
+    var bar = document.getElementById("shareBar");
+    var toast = document.getElementById("shareToast");
+    var TEXT = "Millat Question Bank: আলিম ও দাখিলের প্রশ্নপত্র এখানে পাবে";
+    function say(msg) {
+      toast.textContent = msg;
+      toast.style.display = "block";
+      setTimeout(function () { toast.style.display = "none"; }, 2600);
+    }
+    function copyLink(url) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(url).then(function () { return true; }, function () { return false; });
+      }
+      return Promise.resolve(false);
+    }
+    bar.addEventListener("click", function (e) {
+      var b = e.target.closest("button");
+      if (!b) return;
+      var url = location.href;
+      var u = encodeURIComponent(url);
+      var t = encodeURIComponent(TEXT);
+      var kind = b.getAttribute("data-s");
+      if (kind === "wa") {
+        window.open("https://wa.me/?text=" + encodeURIComponent(TEXT + "\n" + url), "_blank", "noopener");
+      } else if (kind === "tg") {
+        window.open("https://t.me/share/url?url=" + u + "&text=" + t, "_blank", "noopener");
+      } else {
+        var mobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (mobile) {
+          location.href = "fb-messenger://share/?link=" + u;
+        } else {
+          copyLink(url).then(function (ok) {
+            say(ok ? "লিংক কপি হয়েছে, Messenger এ পেস্ট করো" : "লিংক: " + url);
+            window.open("https://www.messenger.com/", "_blank", "noopener");
+          });
+        }
+      }
+    });
+  })();
   </script>
 
   <!-- Mobile scroll indicator -->
