@@ -22,16 +22,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"></noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
 
   <!-- Tailwind CSS (pre-built, minified) -->
   <link rel="stylesheet" href="tailwind.css?v=9" />
   <link rel="preload" as="image" href="images/hero.webp" type="image/webp" fetchpriority="high" />
   
   <!-- Font Awesome Icons -->
-  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin>
 
   <script>try{if(localStorage.getItem("mqb-theme")==="light")document.documentElement.classList.add("light")}catch(e){}</script>
   <style>
@@ -323,6 +321,31 @@
       #shareBar button { width: 44px; height: 44px; font-size: 22px; }
     }
 
+    /* ---- Smoothness fixes ---- */
+    .campus-count { min-height: 1.2em; opacity: 0; transition: opacity .25s ease; }
+    .campus-count.ready { opacity: 1; }
+    .year-pill-btn { animation: pillIn .2s ease-out both; }
+    @keyframes pillIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    button, a, .subject-btn, .year-pill-btn, [onclick] { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+    /* touch screens: no "stuck" hover movement after a tap */
+    @media (hover: none) {
+      .year-pill-blue:hover, .year-pill-orange:hover, .year-pill-dark:hover, .year-pill-gold:hover,
+      .subject-btn:hover { transform: none !important; }
+      .group:hover .group-hover\:translate-x-1 { transform: none !important; }
+    }
+    /* phones: drop only the blur effects nobody can see (they sit under a near-opaque dark layer) */
+    @media (max-width: 639.98px) {
+      .glass-card, #dynamic-backdrop > div {
+        -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+      }
+      /* same soft green glow, drawn without the expensive blur filter */
+      .blur-3xl {
+        filter: none !important;
+        background-color: transparent !important;
+        background-image: radial-gradient(circle, rgba(16, 185, 129, 0.10) 0%, rgba(16, 185, 129, 0) 68%) !important;
+      }
+    }
+
     /* Bangla font: Anek Bangla (Latin text keeps Plus Jakarta Sans) */
     html body, .font-bangla {
       font-family: "Plus Jakarta Sans", "Anek Bangla", sans-serif !important;
@@ -515,7 +538,7 @@
               <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">
                 Tamirul Millat Kamil Madrasah, Tongi
               </h3>
-              <p class="text-xs text-slate-400 font-bangla mt-1 campus-count" data-campus="tongi">আপাতত ০ টি প্রশ্ন আছে</p>
+              <p class="text-xs text-slate-400 font-bangla mt-1 campus-count" data-campus="tongi">&nbsp;</p>
             </div>
 
             <button class="w-full py-1.5 px-4 rounded-xl bg-slate-800 group-hover:bg-emerald-600 text-slate-200 group-hover:text-white font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm font-bangla">
@@ -541,7 +564,7 @@
               <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">
                 Tamirul Millat Mohila Kamil Madrasah
               </h3>
-              <p class="text-xs text-slate-400 font-bangla mt-1 campus-count" data-campus="mohila">আপাতত ০ টি প্রশ্ন আছে</p>
+              <p class="text-xs text-slate-400 font-bangla mt-1 campus-count" data-campus="mohila">&nbsp;</p>
             </div>
 
             <button class="w-full py-1.5 px-4 rounded-xl bg-slate-800 group-hover:bg-emerald-600 text-slate-200 group-hover:text-white font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm font-bangla">
@@ -567,7 +590,7 @@
               <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">
                 Tamirul Millat Kamil Madrasah Dhaka
               </h3>
-              <p class="text-xs text-slate-400 font-bangla mt-1 campus-count" data-campus="dhaka">আপাতত ০ টি প্রশ্ন আছে</p>
+              <p class="text-xs text-slate-400 font-bangla mt-1 campus-count" data-campus="dhaka">&nbsp;</p>
             </div>
 
             <button class="w-full py-1.5 px-4 rounded-xl bg-slate-800 group-hover:bg-emerald-600 text-slate-200 group-hover:text-white font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm font-bangla">
@@ -1077,7 +1100,10 @@
     function toBnDigits(n) {
       return String(n).replace(/\d/g, function (d) { return "০১২৩৪৫৬৭৮৯"[d]; });
     }
+    var countsForced = false;
+    setTimeout(function () { countsForced = true; updateCampusCounts(); }, 2500);
     function updateCampusCounts() {
+      if (apiState !== "ok" && apiState !== "failed" && !countsForced) return;
       var counts = { tongi: 0, mohila: 0, dhaka: 0 };
       AVAILABLE_PAPERS.forEach(function (path) {
         var m = PAPER_NAME_RE.exec(path);
@@ -1085,6 +1111,7 @@
       });
       document.querySelectorAll(".campus-count").forEach(function (el) {
         el.textContent = "আপাতত " + toBnDigits(counts[el.dataset.campus] || 0) + " টি প্রশ্ন আছে";
+        el.classList.add("ready");
       });
     }
     updateCampusCounts();
