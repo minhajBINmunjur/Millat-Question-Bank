@@ -27,6 +27,9 @@
   <!-- Tailwind CSS (pre-built, minified) -->
   <link rel="stylesheet" href="tailwind.css?v=9" />
   <link rel="preload" as="image" href="images/hero.webp" type="image/webp" fetchpriority="high" />
+  <link rel="preload" as="image" href="images/tongi.webp" type="image/webp" />
+  <link rel="preload" as="image" href="images/mohila.webp" type="image/webp" media="(min-width: 768px)" />
+  <link rel="preload" as="image" href="images/dhaka.webp" type="image/webp" media="(min-width: 768px)" />
   
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin>
@@ -354,6 +357,11 @@
       .lift-wrap > div:hover { transform: none !important; }
     }
 
+    /* ---- Photos fade in softly (no white/grey flash while they load) ---- */
+    .campus-img > img, .hero-img > img { opacity: 0; transition: opacity .35s ease; }
+    .campus-img > img.img-ready, .hero-img > img.img-ready { opacity: 1; }
+    .campus-img > img:not(.img-ready) + div { opacity: 0 !important; }
+
     /* ---- Smoothness fixes ---- */
     .campus-count { height: 1rem; line-height: 1rem; opacity: 0; transition: opacity .25s ease; }
     .campus-count.ready { opacity: 1; }
@@ -436,6 +444,7 @@
       }
     }
   </style>
+  <noscript><style>.campus-img > img, .hero-img > img { opacity: 1 !important; }</style></noscript>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen selection:bg-emerald-500 selection:text-white">
 
@@ -587,7 +596,7 @@
           class="group relative cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-800 hover:border-emerald-500 bg-slate-900/80 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/20 flex flex-col"
         >
           <div class="relative campus-img w-full overflow-hidden bg-slate-950">
-            <img class="w-full h-full object-cover" width="1024" height="537" alt="" loading="lazy" decoding="async"
+            <img class="w-full h-full object-cover" width="1024" height="537" alt="" decoding="async"
               src="images/mohila.webp" />
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
           </div>
@@ -613,7 +622,7 @@
           class="group relative cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-800 hover:border-emerald-500 bg-slate-900/80 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/20 flex flex-col"
         >
           <div class="relative campus-img w-full overflow-hidden bg-slate-950">
-            <img class="w-full h-full object-cover" width="1024" height="537" alt="" loading="lazy" decoding="async"
+            <img class="w-full h-full object-cover" width="1024" height="537" alt="" decoding="async"
               src="images/dhaka.webp" />
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
           </div>
@@ -1379,6 +1388,20 @@
         }
       }
     }
+  </script>
+
+  <script>
+  (function () {
+    var imgs = document.querySelectorAll(".campus-img > img, .hero-img > img");
+    function ready(img) { img.classList.add("img-ready"); }
+    imgs.forEach(function (img) {
+      if (img.complete && img.naturalWidth) { ready(img); return; }
+      img.addEventListener("load", function () { ready(img); }, { once: true });
+      img.addEventListener("error", function () { ready(img); }, { once: true });
+    });
+    // safety: never leave a photo hidden
+    setTimeout(function () { imgs.forEach(ready); }, 4000);
+  })();
   </script>
 
   <script>
