@@ -467,6 +467,31 @@
       }
     }
   
+    /* Red file icon with a red circular X badge for empty-paper states */
+    .empty-file-icon {
+      position: relative;
+      display: inline-block;
+      color: #ef4444;
+      font-size: 2.25rem;
+      line-height: 1;
+    }
+    .empty-file-icon > i { color: #ef4444; }
+    .empty-file-x {
+      position: absolute;
+      right: -8px;
+      bottom: -3px;
+      width: 21px;
+      height: 21px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ef4444;
+      color: #ffffff;
+      font: 700 15px/1 system-ui, -apple-system, "Segoe UI", sans-serif;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
+
     /* Red "x" badge: subject has no uploaded paper yet */
     .subject-btn { position: relative; }
     .subject-btn.no-papers::after {
@@ -808,7 +833,7 @@
       </div>
 
       <div id="no-papers-msg" style="display: none;" class="p-10 rounded-2xl glass-card border border-slate-700/80 text-center">
-        <i class="fa-solid fa-file-circle-question text-4xl text-slate-600 mb-3"></i>
+        <span class="empty-file-icon mb-3" aria-hidden="true"><i class="fa-solid fa-file"></i><span class="empty-file-x">×</span></span>
         <p class="text-sm sm:text-base text-slate-300 font-bangla">এই বিষয়ের কোনো প্রশ্ন এখনো upload করা হয়নি।</p>
       </div>
 
@@ -1160,7 +1185,7 @@
     };
     const PAPER_EMPTY_HTML =
       '<div class="p-10 bg-slate-950/60 text-center">' +
-      '<i class="fa-solid fa-file-circle-question text-4xl text-slate-600 mb-3"></i>' +
+      '<span class="empty-file-icon mb-3" aria-hidden="true"><i class="fa-solid fa-file"></i><span class="empty-file-x">×</span></span>' +
       '<p class="text-sm text-slate-400 font-bangla">প্রশ্ন না পাঠাইলে যুক্ত করব কিভাবে ??</p></div>';
     let paperToken = 0;
     const paperExistsCache = Object.create(null);
