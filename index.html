@@ -466,6 +466,18 @@
         border: 1px solid rgba(255, 255, 255, 0.35);
       }
     }
+  
+    /* Red "x" badge: subject has no uploaded paper yet */
+    .subject-btn { position: relative; }
+    .subject-btn.no-papers::after {
+      content: "x";
+      position: absolute; top: -7px; right: -3px;
+      width: 19px; height: 19px; border-radius: 50%;
+      background: #ef4444; color: #ffffff;
+      font: 700 11px/19px system-ui, -apple-system, "Segoe UI", sans-serif;
+      text-align: center; pointer-events: none;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
   </style>
   <noscript><style>.campus-img > img, .hero-img > img { opacity: 1 !important; }</style></noscript>
 </head>
@@ -1031,6 +1043,7 @@
     function goToPage(page) {
       _goToPage(page);
       if (page === "exams") updateYearButtons();
+      if (page === "subjects") updateSubjectBadges();
       syncUrl();
     }
 
@@ -1188,13 +1201,35 @@
         apiState = "ok";
         updateCampusCounts();
         updateYearButtons();
+        updateSubjectBadges();
       })
       .catch(function () {
         apiState = "failed";
         updateYearButtons();
+        updateSubjectBadges();
       });
 
     // ---- Show only the year buttons that have an uploaded PDF ----
+    // ---- Red "x" on subject buttons that have no uploaded paper for the chosen campus ----
+    function updateSubjectBadges() {
+      var page = document.getElementById("page-subjects");
+      if (!page) return;
+      var campus = currentCampus ? currentCampus.id : null;
+      var known = apiState === "ok" && campus;   // only when the real file list is loaded
+      var paths = [];
+      if (known) AVAILABLE_PAPERS.forEach(function (x) { paths.push(x); });
+      page.querySelectorAll(".subject-btn").forEach(function (btn) {
+        var m = /selectSubject\('([^']+)',\s*'([^']+)'\)/.exec(btn.getAttribute("onclick") || "");
+        var empty = false;
+        if (known && m) {
+          var sub = slugify(m[2]);
+          if (sub === "ict") sub += "-" + m[1].toLowerCase();
+          var prefix = "pdfs/" + campus + "_" + sub + "_";
+          empty = !paths.some(function (x) { return x.indexOf(prefix) === 0; });
+        }
+        btn.classList.toggle("no-papers", empty);
+      });
+    }
     var apiState = "pending";
     var paperProbing = {};
     function probePaper(url) {
@@ -1293,6 +1328,7 @@
           }
         } else {
           _goToPage("subjects");
+          updateSubjectBadges();
         }
       } finally {
         restoring = false;
