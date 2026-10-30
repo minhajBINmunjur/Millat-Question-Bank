@@ -27,12 +27,11 @@
   <!-- Tailwind CSS (pre-built, minified) -->
   <link rel="stylesheet" href="tailwind.css?v=9" />
   <link rel="preload" as="image" href="images/hero.webp" type="image/webp" fetchpriority="high" />
-  <link rel="preload" as="image" href="images/tongi.webp" type="image/webp" />
-  <link rel="preload" as="image" href="images/mohila.webp" type="image/webp" media="(min-width: 768px)" />
-  <link rel="preload" as="image" href="images/dhaka.webp" type="image/webp" media="(min-width: 768px)" />
   
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin>
+  <!-- Font Awesome Icons (async – non-render-blocking) -->
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin></noscript>
 
   <script>try{if(localStorage.getItem("mqb-theme")==="light")document.documentElement.classList.add("light")}catch(e){}</script>
   <style>
@@ -336,8 +335,12 @@
        The design fills the screen, so tiny height changes made the page scrollbar appear/disappear,
        the page width jumped, and the cards animated their size (transition-all). */
     html { scrollbar-gutter: stable; }
+    /* Paint containment: reduce repaints when sections toggle visibility */
+    #page-campuses, #page-subjects, #page-exams { contain: layout style; }
     #page-campuses, #page-campuses * {
       transition-property: color, background-color, border-color, box-shadow, opacity, transform !important;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+      transition-duration: 0.15s !important;
     }
 
     /* ---- Campus card lift without trembling ----
@@ -345,7 +348,7 @@
        the card moved away from the cursor, lost hover, dropped back, regained hover... = shaking.
        A wrapper keeps the hover area in place while only the card moves. */
     .lift-wrap { display: flex; flex-direction: column; padding-bottom: 14px; margin-bottom: -14px; }
-    .lift-wrap > div { flex: 1 1 auto; }
+    .lift-wrap > div { flex: 1 1 auto; will-change: transform; }
     @media (hover: hover) {
       .lift-wrap:hover > div {
         transform: translateY(-0.5rem) !important;
@@ -374,8 +377,8 @@
       .subject-btn:hover { transform: none !important; }
       .group:hover .group-hover\:translate-x-1 { transform: none !important; }
     }
-    /* phones: drop only the blur effects nobody can see (they sit under a near-opaque dark layer) */
-    @media (max-width: 639.98px) {
+    /* phones & tablets: drop blur effects that cause GPU jank */
+    @media (max-width: 1023.98px) {
       .glass-card, #dynamic-backdrop > div {
         -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
       }
@@ -514,7 +517,7 @@
   </div>
 
   <!-- Top Navigation Bar -->
-  <header class="sticky top-0 z-40 bg-slate-950/85 backdrop-blur-md border-b border-slate-800">
+  <header class="sticky top-0 z-40 bg-slate-950/90 border-b border-slate-800" style="-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
       
       <!-- Brand Logo -->
@@ -630,7 +633,7 @@
           class="group relative cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-800 hover:border-emerald-500 bg-slate-900/80 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/20 flex flex-col"
         >
           <div class="relative campus-img w-full overflow-hidden bg-slate-950">
-            <img class="w-full h-full object-cover" width="1024" height="752" alt="" decoding="async"
+            <img class="w-full h-full object-cover" width="1024" height="752" alt="" decoding="async" loading="lazy"
               src="images/tongi.webp" />
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
           </div>
@@ -656,7 +659,7 @@
           class="group relative cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-800 hover:border-emerald-500 bg-slate-900/80 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/20 flex flex-col"
         >
           <div class="relative campus-img w-full overflow-hidden bg-slate-950">
-            <img class="w-full h-full object-cover" width="1024" height="537" alt="" decoding="async"
+            <img class="w-full h-full object-cover" width="1024" height="537" alt="" decoding="async" loading="lazy"
               src="images/mohila.webp" />
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
           </div>
@@ -682,7 +685,7 @@
           class="group relative cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-800 hover:border-emerald-500 bg-slate-900/80 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/20 flex flex-col"
         >
           <div class="relative campus-img w-full overflow-hidden bg-slate-950">
-            <img class="w-full h-full object-cover" width="1024" height="537" alt="" decoding="async"
+            <img class="w-full h-full object-cover" width="1024" height="537" alt="" decoding="async" loading="lazy"
               src="images/dhaka.webp" />
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
           </div>
@@ -1084,7 +1087,7 @@
       pageSubjects.style.display = "none";
       pageExams.style.display = "none";
 
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: "instant" });
 
       if (page === "campuses") {
         currentCampus = null;
@@ -1193,9 +1196,47 @@
     // Static manifest avoids a network HEAD request every time a paper is opened.
     // Add each newly uploaded PDF path here when adding a paper to /pdfs.
     const AVAILABLE_PAPERS = new Set([
+      "pdfs/tongi_bangla-2nd_test_2024.pdf",
+      "pdfs/tongi_bangla-2nd_test_2026.pdf",
+      "pdfs/tongi_bangla-2nd_yearly_2023.pdf",
+      "pdfs/tongi_bio-1st_half-yearly_2024.pdf",
+      "pdfs/tongi_bio-1st_test_2024.pdf",
+      "pdfs/tongi_bio-1st_test_2026.pdf",
+      "pdfs/tongi_bio-1st_yearly_2023.pdf",
+      "pdfs/tongi_bio-2nd_half-yearly_2023.pdf",
+      "pdfs/tongi_bio-2nd_half-yearly_2024.pdf",
+      "pdfs/tongi_bio-2nd_test_2024.pdf",
+      "pdfs/tongi_bio-2nd_test_2026.pdf",
+      "pdfs/tongi_bio-2nd_yearly_2023.pdf",
+      "pdfs/tongi_chemistry-1st_test_2024.pdf",
+      "pdfs/tongi_chemistry-1st_test_2026.pdf",
+      "pdfs/tongi_chemistry-1st_yearly_2023.pdf",
+      "pdfs/tongi_chemistry-2nd_half-yearly_2024.pdf",
       "pdfs/tongi_chemistry-2nd_test_2024.pdf",
+      "pdfs/tongi_chemistry-2nd_test_2026.pdf",
+      "pdfs/tongi_chemistry-2nd_yearly_2023.pdf",
+      "pdfs/tongi_english-2nd_test_2024.pdf",
+      "pdfs/tongi_english-2nd_test_2026.pdf",
+      "pdfs/tongi_english-2nd_yearly_2023.pdf",
+      "pdfs/tongi_ict-alim_test_2024.pdf",
+      "pdfs/tongi_ict-alim_test_2026.pdf",
+      "pdfs/tongi_ict-alim_yearly_2023.pdf",
       "pdfs/tongi_math-1st_test_2024.pdf",
-      "pdfs/tongi_physics-2nd_test_2024.pdf"
+      "pdfs/tongi_math-1st_test_2026.pdf",
+      "pdfs/tongi_math-1st_yearly_2023.pdf",
+      "pdfs/tongi_math-2nd_half-yearly_2024.pdf",
+      "pdfs/tongi_math-2nd_test_2024.pdf",
+      "pdfs/tongi_math-2nd_test_2026.pdf",
+      "pdfs/tongi_math-2nd_yearly_2023.pdf",
+      "pdfs/tongi_physics-1st_half-yearly_2024.pdf",
+      "pdfs/tongi_physics-1st_test_2024.pdf",
+      "pdfs/tongi_physics-1st_test_2026.pdf",
+      "pdfs/tongi_physics-1st_yearly_2023.pdf",
+      "pdfs/tongi_physics-2nd_half-yearly_2023.pdf",
+      "pdfs/tongi_physics-2nd_half-yearly_2024.pdf",
+      "pdfs/tongi_physics-2nd_test_2024.pdf",
+      "pdfs/tongi_physics-2nd_test_2026.pdf",
+      "pdfs/tongi_physics-2nd_yearly_2023.pdf"
     ]);
 
     // ---- Auto question count per campus (shown on the campus cards) ----
@@ -1219,7 +1260,7 @@
     }
     updateCampusCounts();
     // Ask the server for the real list of PDFs in /pdfs (api/papers.js); falls back to the list above
-    fetch("/api/papers", { cache: "no-store" })
+    fetch("/api/papers")
       .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
       .then(function (data) {
         (data.files || []).forEach(function (name) { AVAILABLE_PAPERS.add("pdfs/" + name); });
@@ -1262,10 +1303,10 @@
         var type = (r.headers.get("content-type") || "").toLowerCase();
         return r.ok && type.indexOf("text/html") === -1;
       }
-      return fetch(url, { method: "HEAD", cache: "no-store" })
+      return fetch(url, { method: "HEAD" })
         .then(function (r) {
           if (ok(r)) return true;
-          return fetch(url, { headers: { Range: "bytes=0-4" }, cache: "no-store" }).then(ok);
+          return fetch(url, { headers: { Range: "bytes=0-4" } }).then(ok);
         })
         .catch(function () { return false; });
     }
@@ -1397,11 +1438,11 @@
         var type = (r.headers.get("content-type") || "").toLowerCase();
         return r.ok && type.indexOf("text/html") === -1;
       }
-      fetch(url, { method: "HEAD", cache: "no-store" })
+      fetch(url, { method: "HEAD" })
         .then(function (r) {
           if (looksLikePdf(r)) return true;
           // Some hosts answer HEAD badly, so double-check with a tiny GET
-          return fetch(url, { headers: { Range: "bytes=0-4" }, cache: "no-store" }).then(looksLikePdf);
+          return fetch(url, { headers: { Range: "bytes=0-4" } }).then(looksLikePdf);
         })
         .catch(function () { return false; })
         .then(function (ok) {
