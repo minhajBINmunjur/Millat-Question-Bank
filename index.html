@@ -26,9 +26,6 @@
 
   <!-- Tailwind CSS (pre-built, minified) -->
   <link rel="stylesheet" href="tailwind.css?v=9" />
-  <link rel="preload" href="fonts/plus-jakarta-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="preload" href="fonts/anek-bangla-bengali.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="preload" href="fonts/anek-bangla-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" as="image" href="images/hero.webp" type="image/webp" fetchpriority="high" />
   <link rel="preload" as="image" href="images/tongi.webp" type="image/webp" />
   <link rel="preload" as="image" href="images/mohila.webp" type="image/webp" media="(min-width: 768px)" />
@@ -328,11 +325,11 @@
     }
 
     /* ---- Self-hosted fonts ---- */
-    @font-face { font-family: "Plus Jakarta Sans"; font-style: normal; font-weight: 200 800; font-display: optional;
+    @font-face { font-family: "Plus Jakarta Sans"; font-style: normal; font-weight: 200 800; font-display: swap;
       src: url(fonts/plus-jakarta-sans-latin.woff2) format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-    @font-face { font-family: "Anek Bangla"; font-style: normal; font-weight: 100 800; font-display: optional;
+    @font-face { font-family: "Anek Bangla"; font-style: normal; font-weight: 100 800; font-display: swap;
       src: url(fonts/anek-bangla-bengali.woff2) format("woff2"); unicode-range: U+0951-0952,U+0964-0965,U+0980-09FE,U+1CD0,U+1CD2,U+1CD5-1CD6,U+1CD8,U+1CE1,U+1CEA,U+1CED,U+1CF2,U+1CF5-1CF7,U+200C-200D,U+20B9,U+25CC,U+A8F1; }
-    @font-face { font-family: "Anek Bangla"; font-style: normal; font-weight: 100 800; font-display: optional;
+    @font-face { font-family: "Anek Bangla"; font-style: normal; font-weight: 100 800; font-display: swap;
       src: url(fonts/anek-bangla-latin.woff2) format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
 
     /* ---- Stop the "shaking" on refresh ----
@@ -361,9 +358,9 @@
     }
 
     /* ---- Photos fade in softly (no white/grey flash while they load) ---- */
-    /* Keep image boxes visually stable while files load; no fade-in flicker. */
-    .campus-img > img, .hero-img > img { opacity: 1; transition: none !important; }
-    .campus-img > img:not(.img-ready) + div { opacity: 0.6; }
+    .campus-img > img, .hero-img > img { opacity: 0; transition: opacity .35s ease; }
+    .campus-img > img.img-ready, .hero-img > img.img-ready { opacity: 1; }
+    .campus-img > img:not(.img-ready) + div { opacity: 0 !important; }
 
     /* ---- Smoothness fixes ---- */
     .campus-count { height: 1rem; line-height: 1rem; opacity: 0; transition: opacity .25s ease; }
@@ -444,6 +441,29 @@
         background: #34d399;
         border-radius: 10px;
         box-shadow: 0 0 6px rgba(52, 211, 153, 0.7);
+      }
+    }
+  
+    /* ===== Mobile web only: tighter campus heading + small black & white share icons ===== */
+    @media (max-width: 639.98px) {
+      /* less space around "তোমার ক্যাম্পাসে ক্লিক মারো" */
+      #page-campuses > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem !important; }
+      #page-campuses > div.text-center > :not([hidden]) ~ :not([hidden]) { margin-top: 0.1rem !important; }
+      #page-campuses > div.text-center h2 { line-height: 1.2 !important; margin: 0 !important; }
+      #page-campuses > div.text-center p { line-height: 1.25 !important; margin: 0 !important; }
+
+      /* share icons: black & white, ~35% smaller, a bit lower */
+      #shareBar { top: 70%; right: 10px; gap: 6px; }
+      #shareBar button {
+        width: 25px; height: 25px; font-size: 13px; border-radius: 8px;
+        background: #ffffff !important; color: #000000 !important;
+        border: 1px solid rgba(0, 0, 0, 0.18);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.22);
+        opacity: 0.95;
+      }
+      html:not(.light) #shareBar button {
+        background: #000000 !important; color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.35);
       }
     }
   </style>
