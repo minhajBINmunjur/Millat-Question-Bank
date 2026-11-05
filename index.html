@@ -27,11 +27,12 @@
   <!-- Tailwind CSS (pre-built, minified) -->
   <link rel="stylesheet" href="tailwind.css?v=9" />
   <link rel="preload" as="image" href="images/hero.webp" type="image/webp" fetchpriority="high" />
+  <link rel="preload" as="image" href="images/tongi.webp" type="image/webp" />
+  <link rel="preload" as="image" href="images/mohila.webp" type="image/webp" media="(min-width: 768px)" />
+  <link rel="preload" as="image" href="images/dhaka.webp" type="image/webp" media="(min-width: 768px)" />
   
-  <!-- Font Awesome Icons (async – non-render-blocking) -->
-  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" crossorigin>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin></noscript>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin>
 
   <script>try{if(localStorage.getItem("mqb-theme")==="light")document.documentElement.classList.add("light")}catch(e){}</script>
   <style>
@@ -335,12 +336,8 @@
        The design fills the screen, so tiny height changes made the page scrollbar appear/disappear,
        the page width jumped, and the cards animated their size (transition-all). */
     html { scrollbar-gutter: stable; }
-    /* Paint containment: reduce repaints when sections toggle visibility */
-    #page-campuses, #page-subjects, #page-exams { contain: layout style; }
     #page-campuses, #page-campuses * {
       transition-property: color, background-color, border-color, box-shadow, opacity, transform !important;
-      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
-      transition-duration: 0.15s !important;
     }
 
     /* ---- Campus card lift without trembling ----
@@ -348,7 +345,7 @@
        the card moved away from the cursor, lost hover, dropped back, regained hover... = shaking.
        A wrapper keeps the hover area in place while only the card moves. */
     .lift-wrap { display: flex; flex-direction: column; padding-bottom: 14px; margin-bottom: -14px; }
-    .lift-wrap > div { flex: 1 1 auto; will-change: transform; }
+    .lift-wrap > div { flex: 1 1 auto; }
     @media (hover: hover) {
       .lift-wrap:hover > div {
         transform: translateY(-0.5rem) !important;
@@ -377,8 +374,8 @@
       .subject-btn:hover { transform: none !important; }
       .group:hover .group-hover\:translate-x-1 { transform: none !important; }
     }
-    /* phones & tablets: drop blur effects that cause GPU jank */
-    @media (max-width: 1023.98px) {
+    /* phones: drop only the blur effects nobody can see (they sit under a near-opaque dark layer) */
+    @media (max-width: 639.98px) {
       .glass-card, #dynamic-backdrop > div {
         -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
       }
@@ -470,31 +467,6 @@
       }
     }
   
-    /* Red file icon with a red circular X badge for empty-paper states */
-    .empty-file-icon {
-      position: relative;
-      display: inline-block;
-      color: #ef4444;
-      font-size: 2.25rem;
-      line-height: 1;
-    }
-    .empty-file-icon > i { color: #ef4444; }
-    .empty-file-x {
-      position: absolute;
-      right: -8px;
-      bottom: -3px;
-      width: 21px;
-      height: 21px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #ef4444;
-      color: #ffffff;
-      font: 700 15px/1 system-ui, -apple-system, "Segoe UI", sans-serif;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-    }
-
     /* Red "x" badge: subject has no uploaded paper yet */
     .subject-btn { position: relative; }
     .subject-btn.no-papers::after {
@@ -505,6 +477,43 @@
       font: 700 11px/19px system-ui, -apple-system, "Segoe UI", sans-serif;
       text-align: center; pointer-events: none;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
+  
+    /* "no paper uploaded" icon: red (same icon, same size) */
+    .icon-red, html.light .icon-red { color: #ef4444 !important; }
+  
+    /* ===== Phones: paper viewer shows the whole first page; download button floats near the bottom ===== */
+    @media (max-width: 639.98px) {
+      #question-modal {
+        padding: 0 !important; align-items: stretch !important; overflow: hidden !important;
+        background: #020617 !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+      }
+      #question-modal > div {
+        margin: 0 !important; max-width: none !important; border: 0 !important; border-radius: 0 !important;
+        height: 100vh; height: 100dvh; display: flex; flex-direction: column;
+      }
+      #question-modal > div > div:first-child { padding: 0.6rem 1rem !important; flex: none; }
+      #modal-body { flex: 1 1 auto; min-height: 0; position: relative; display: flex; flex-direction: column; }
+      .pdf-mobile { position: relative; flex: 1 1 auto; min-height: 0; background: rgba(2, 6, 23, 0.7); }
+      .pdf-scroll {
+        position: absolute; inset: 0; overflow: auto; -webkit-overflow-scrolling: touch;
+        display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+        padding: 8px 8px 84px; touch-action: pan-x pan-y pinch-zoom;
+      }
+      .pdf-scroll canvas { flex: none; margin: 0 auto; background: #fff; border-radius: 4px; box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45); }
+      .pdf-loading { margin: auto; color: #94a3b8; font-size: 14px; }
+      .pdf-actions {
+        position: absolute; right: 12px; z-index: 5; display: flex; align-items: center; gap: 8px;
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 88px);
+      }
+      .pdf-dl {
+        display: inline-flex; align-items: center; gap: 7px; padding: 10px 16px; border-radius: 999px;
+        background: #059669; color: #fff; font-size: 14px; font-weight: 600; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+      }
+      .pdf-open {
+        width: 40px; height: 40px; border-radius: 50%; background: rgba(30, 41, 59, 0.96); color: #e2e8f0;
+        display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+      }
     }
   </style>
   <noscript><style>.campus-img > img, .hero-img > img { opacity: 1 !important; }</style></noscript>
@@ -517,7 +526,7 @@
   </div>
 
   <!-- Top Navigation Bar -->
-  <header class="sticky top-0 z-40 bg-slate-950/90 border-b border-slate-800" style="-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);">
+  <header class="sticky top-0 z-40 bg-slate-950/85 backdrop-blur-md border-b border-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
       
       <!-- Brand Logo -->
@@ -633,7 +642,7 @@
           class="group relative cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-800 hover:border-emerald-500 bg-slate-900/80 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/20 flex flex-col"
         >
           <div class="relative campus-img w-full overflow-hidden bg-slate-950">
-            <img class="w-full h-full object-cover" width="1024" height="752" alt="" decoding="async" loading="lazy"
+            <img class="w-full h-full object-cover" width="1024" height="752" alt="" decoding="async"
               src="images/tongi.webp" />
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
           </div>
@@ -659,7 +668,7 @@
           class="group relative cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-800 hover:border-emerald-500 bg-slate-900/80 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/20 flex flex-col"
         >
           <div class="relative campus-img w-full overflow-hidden bg-slate-950">
-            <img class="w-full h-full object-cover" width="1024" height="537" alt="" decoding="async" loading="lazy"
+            <img class="w-full h-full object-cover" width="1024" height="537" alt="" decoding="async"
               src="images/mohila.webp" />
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
           </div>
@@ -685,7 +694,7 @@
           class="group relative cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-800 hover:border-emerald-500 bg-slate-900/80 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/20 flex flex-col"
         >
           <div class="relative campus-img w-full overflow-hidden bg-slate-950">
-            <img class="w-full h-full object-cover" width="1024" height="537" alt="" decoding="async" loading="lazy"
+            <img class="w-full h-full object-cover" width="1024" height="537" alt="" decoding="async"
               src="images/dhaka.webp" />
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
           </div>
@@ -836,7 +845,7 @@
       </div>
 
       <div id="no-papers-msg" style="display: none;" class="p-10 rounded-2xl glass-card border border-slate-700/80 text-center">
-        <span class="empty-file-icon mb-3" aria-hidden="true"><i class="fa-solid fa-file"></i><span class="empty-file-x">×</span></span>
+        <i class="fa-solid fa-file-circle-question text-4xl mb-3 icon-red"></i>
         <p class="text-sm sm:text-base text-slate-300 font-bangla">এই বিষয়ের কোনো প্রশ্ন এখনো upload করা হয়নি।</p>
       </div>
 
@@ -1087,7 +1096,7 @@
       pageSubjects.style.display = "none";
       pageExams.style.display = "none";
 
-      window.scrollTo({ top: 0, behavior: "instant" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
 
       if (page === "campuses") {
         currentCampus = null;
@@ -1188,7 +1197,7 @@
     };
     const PAPER_EMPTY_HTML =
       '<div class="p-10 bg-slate-950/60 text-center">' +
-      '<span class="empty-file-icon mb-3" aria-hidden="true"><i class="fa-solid fa-file"></i><span class="empty-file-x">×</span></span>' +
+      '<i class="fa-solid fa-file-circle-question text-4xl mb-3 icon-red"></i>' +
       '<p class="text-sm text-slate-400 font-bangla">প্রশ্ন না পাঠাইলে যুক্ত করব কিভাবে ??</p></div>';
     let paperToken = 0;
     const paperExistsCache = Object.create(null);
@@ -1196,47 +1205,9 @@
     // Static manifest avoids a network HEAD request every time a paper is opened.
     // Add each newly uploaded PDF path here when adding a paper to /pdfs.
     const AVAILABLE_PAPERS = new Set([
-      "pdfs/tongi_bangla-2nd_test_2024.pdf",
-      "pdfs/tongi_bangla-2nd_test_2026.pdf",
-      "pdfs/tongi_bangla-2nd_yearly_2023.pdf",
-      "pdfs/tongi_bio-1st_half-yearly_2024.pdf",
-      "pdfs/tongi_bio-1st_test_2024.pdf",
-      "pdfs/tongi_bio-1st_test_2026.pdf",
-      "pdfs/tongi_bio-1st_yearly_2023.pdf",
-      "pdfs/tongi_bio-2nd_half-yearly_2023.pdf",
-      "pdfs/tongi_bio-2nd_half-yearly_2024.pdf",
-      "pdfs/tongi_bio-2nd_test_2024.pdf",
-      "pdfs/tongi_bio-2nd_test_2026.pdf",
-      "pdfs/tongi_bio-2nd_yearly_2023.pdf",
-      "pdfs/tongi_chemistry-1st_test_2024.pdf",
-      "pdfs/tongi_chemistry-1st_test_2026.pdf",
-      "pdfs/tongi_chemistry-1st_yearly_2023.pdf",
-      "pdfs/tongi_chemistry-2nd_half-yearly_2024.pdf",
       "pdfs/tongi_chemistry-2nd_test_2024.pdf",
-      "pdfs/tongi_chemistry-2nd_test_2026.pdf",
-      "pdfs/tongi_chemistry-2nd_yearly_2023.pdf",
-      "pdfs/tongi_english-2nd_test_2024.pdf",
-      "pdfs/tongi_english-2nd_test_2026.pdf",
-      "pdfs/tongi_english-2nd_yearly_2023.pdf",
-      "pdfs/tongi_ict-alim_test_2024.pdf",
-      "pdfs/tongi_ict-alim_test_2026.pdf",
-      "pdfs/tongi_ict-alim_yearly_2023.pdf",
       "pdfs/tongi_math-1st_test_2024.pdf",
-      "pdfs/tongi_math-1st_test_2026.pdf",
-      "pdfs/tongi_math-1st_yearly_2023.pdf",
-      "pdfs/tongi_math-2nd_half-yearly_2024.pdf",
-      "pdfs/tongi_math-2nd_test_2024.pdf",
-      "pdfs/tongi_math-2nd_test_2026.pdf",
-      "pdfs/tongi_math-2nd_yearly_2023.pdf",
-      "pdfs/tongi_physics-1st_half-yearly_2024.pdf",
-      "pdfs/tongi_physics-1st_test_2024.pdf",
-      "pdfs/tongi_physics-1st_test_2026.pdf",
-      "pdfs/tongi_physics-1st_yearly_2023.pdf",
-      "pdfs/tongi_physics-2nd_half-yearly_2023.pdf",
-      "pdfs/tongi_physics-2nd_half-yearly_2024.pdf",
-      "pdfs/tongi_physics-2nd_test_2024.pdf",
-      "pdfs/tongi_physics-2nd_test_2026.pdf",
-      "pdfs/tongi_physics-2nd_yearly_2023.pdf"
+      "pdfs/tongi_physics-2nd_test_2024.pdf"
     ]);
 
     // ---- Auto question count per campus (shown on the campus cards) ----
@@ -1260,7 +1231,7 @@
     }
     updateCampusCounts();
     // Ask the server for the real list of PDFs in /pdfs (api/papers.js); falls back to the list above
-    fetch("/api/papers")
+    fetch("/api/papers", { cache: "no-store" })
       .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
       .then(function (data) {
         (data.files || []).forEach(function (name) { AVAILABLE_PAPERS.add("pdfs/" + name); });
@@ -1303,10 +1274,10 @@
         var type = (r.headers.get("content-type") || "").toLowerCase();
         return r.ok && type.indexOf("text/html") === -1;
       }
-      return fetch(url, { method: "HEAD" })
+      return fetch(url, { method: "HEAD", cache: "no-store" })
         .then(function (r) {
           if (ok(r)) return true;
-          return fetch(url, { headers: { Range: "bytes=0-4" } }).then(ok);
+          return fetch(url, { headers: { Range: "bytes=0-4" }, cache: "no-store" }).then(ok);
         })
         .catch(function () { return false; });
     }
@@ -1438,11 +1409,11 @@
         var type = (r.headers.get("content-type") || "").toLowerCase();
         return r.ok && type.indexOf("text/html") === -1;
       }
-      fetch(url, { method: "HEAD" })
+      fetch(url, { method: "HEAD", cache: "no-store" })
         .then(function (r) {
           if (looksLikePdf(r)) return true;
           // Some hosts answer HEAD badly, so double-check with a tiny GET
-          return fetch(url, { headers: { Range: "bytes=0-4" } }).then(looksLikePdf);
+          return fetch(url, { headers: { Range: "bytes=0-4" }, cache: "no-store" }).then(looksLikePdf);
         })
         .catch(function () { return false; })
         .then(function (ok) {
@@ -1451,7 +1422,7 @@
         });
     }
 
-    function paperHtml(url) {
+    function desktopPaperHtml(url) {
       return '<div class="bg-slate-950/60">' +
         '<iframe src="' + url + '" title="Question paper" class="w-full h-[70vh] border-0"></iframe>' +
         '<div class="p-3 flex flex-wrap gap-2 justify-center border-t border-slate-700">' +
@@ -1459,6 +1430,93 @@
         '<a href="' + url + '" download class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold font-bangla transition-all">ডাউনলোড করো</a>' +
         '</div></div>';
     }
+
+
+    // ---- Phone view: show the WHOLE first page (fit to screen), download button floats near the bottom ----
+    var PDFJS_VER = "3.11.174";
+    var pdfjsPromise = null;
+    function isMobileView() { return window.matchMedia("(max-width: 639.98px)").matches; }
+    function paperHtml(url) {
+      if (!isMobileView()) return desktopPaperHtml(url);
+      return '<div class="pdf-mobile" data-url="' + url + '">' +
+        '<div class="pdf-scroll"><div class="pdf-loading font-bangla">প্রশ্নপত্র লোড হচ্ছে…</div></div>' +
+        '<div class="pdf-actions">' +
+        '<a href="' + url + '" target="_blank" rel="noopener" class="pdf-open" aria-label="নতুন ট্যাবে খোলো"><i class="fa-solid fa-up-right-from-square"></i></a>' +
+        '<a href="' + url + '" download class="pdf-dl font-bangla"><i class="fa-solid fa-download"></i> ডাউনলোড</a>' +
+        '</div></div>';
+    }
+    function loadPdfJs() {
+      if (pdfjsPromise) return pdfjsPromise;
+      pdfjsPromise = new Promise(function (resolve, reject) {
+        if (window.pdfjsLib) { resolve(window.pdfjsLib); return; }
+        var sc = document.createElement("script");
+        var base = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/" + PDFJS_VER + "/";
+        sc.src = base + "pdf.min.js";
+        sc.onload = function () {
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc = base + "pdf.worker.min.js";
+          resolve(window.pdfjsLib);
+        };
+        sc.onerror = function () { pdfjsPromise = null; reject(new Error("pdfjs")); };
+        document.head.appendChild(sc);
+      });
+      return pdfjsPromise;
+    }
+    function initMobilePdf(el) {
+      var url = el.getAttribute("data-url");
+      var scroll = el.querySelector(".pdf-scroll");
+      var tok = paperToken;
+      function alive() { return tok === paperToken && document.body.contains(el); }
+      loadPdfJs().then(function (pdfjs) {
+        return pdfjs.getDocument({ url: url }).promise;
+      }).then(async function (pdf) {
+        if (!alive()) return;
+        var first = await pdf.getPage(1);
+        var v1 = first.getViewport({ scale: 1 });
+        var availW = scroll.clientWidth - 16;
+        var availH = scroll.clientHeight - 16 - 84;          // 84px = room kept for the browser's bottom bar
+        var fit = Math.min(availW / v1.width, availH / v1.height);
+        var q = Math.min(3, Math.max(2, window.devicePixelRatio || 1));
+        scroll.innerHTML = "";
+        var canvases = [];
+        for (var i = 1; i <= pdf.numPages; i++) {
+          if (!alive()) return;
+          var page = i === 1 ? first : await pdf.getPage(i);
+          var vp = page.getViewport({ scale: fit });
+          var vpHi = page.getViewport({ scale: fit * q });
+          var c = document.createElement("canvas");
+          c.width = Math.floor(vpHi.width);
+          c.height = Math.floor(vpHi.height);
+          c.dataset.w = Math.floor(vp.width);
+          c.dataset.h = Math.floor(vp.height);
+          c.style.width = c.dataset.w + "px";
+          c.style.height = c.dataset.h + "px";
+          scroll.appendChild(c);
+          canvases.push(c);
+          await page.render({ canvasContext: c.getContext("2d"), viewport: vpHi }).promise;
+        }
+        // double tap = zoom in / out
+        var zoomed = false, last = 0;
+        scroll.addEventListener("click", function () {
+          var now = Date.now();
+          if (now - last < 320) {
+            zoomed = !zoomed;
+            canvases.forEach(function (cv) {
+              var k = zoomed ? 2.2 : 1;
+              cv.style.width = cv.dataset.w * k + "px";
+              cv.style.height = cv.dataset.h * k + "px";
+            });
+          }
+          last = now;
+        });
+      }).catch(function () {
+        if (!alive()) return;
+        scroll.innerHTML = '<iframe src="' + url + '" title="Question paper" style="width:100%;height:100%;border:0;background:#fff"></iframe>';
+      });
+    }
+    new MutationObserver(function () {
+      var el = document.querySelector("#modal-body .pdf-mobile:not([data-init])");
+      if (el) { el.setAttribute("data-init", "1"); initMobilePdf(el); }
+    }).observe(document.getElementById("modal-body"), { childList: true, subtree: true });
 
 
     // Submit Question Modal
