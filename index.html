@@ -517,6 +517,19 @@
     }
   
     .pdf-err { position: absolute; top: 2px; left: 8px; z-index: 4; font-size: 9px; color: #94a3b8; pointer-events: none; }
+  
+    /* scroll indicators inside the paper viewer: touch / mobile web only */
+    .pdf-ind { position: absolute; z-index: 6; pointer-events: none; display: none; }
+    .pdf-ind i { position: absolute; display: block; border-radius: 10px; background: #34d399; box-shadow: 0 0 6px rgba(52, 211, 153, 0.7); }
+    .pdf-ind-v { right: 3px; top: 8px; bottom: 8px; width: 5px; }
+    .pdf-ind-v i { left: 0; width: 100%; min-height: 36px; }
+    .pdf-ind-h { left: 8px; right: 14px; bottom: calc(env(safe-area-inset-bottom, 0px) + 6px); height: 5px; }
+    .pdf-ind-h i { top: 0; height: 100%; min-width: 36px; }
+    @media (hover: none) and (pointer: coarse) {
+      .pdf-ind.on { display: block; }
+      .pdf-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+      .pdf-scroll::-webkit-scrollbar { display: none; }
+    }
   </style>
   <noscript><style>.campus-img > img, .hero-img > img { opacity: 1 !important; }</style></noscript>
 </head>
@@ -1447,6 +1460,7 @@
       if (!isMobileView()) return desktopPaperHtml(url);
       return '<div class="pdf-mobile" data-url="' + url + '">' +
         '<div class="pdf-scroll"><div class="pdf-loading font-bangla">প্রশ্নপত্র লোড হচ্ছে…</div></div>' +
+        '<div class="pdf-ind pdf-ind-v"><i></i></div><div class="pdf-ind pdf-ind-h"><i></i></div>' +
         '<div class="pdf-actions">' +
         '<a href="' + url + '" target="_blank" rel="noopener" class="pdf-open" aria-label="নতুন ট্যাবে খোলো"><i class="fa-solid fa-up-right-from-square"></i></a>' +
         '<a href="' + url + '" download class="pdf-dl font-bangla"><i class="fa-solid fa-download"></i> ডাউনলোড</a>' +
@@ -1489,11 +1503,37 @@
         '<iframe src="' + url + '" title="Question paper" style="width:' + natural + 'px;height:' + Math.floor(h / k) +
         'px;border:0;transform:scale(' + k + ');transform-origin:0 0"></iframe></div>';
     }
+    // always-visible green scroll indicators (right edge = up/down, bottom edge = left/right)
+    function updatePdfIndicators(el) {
+      var sc = el.querySelector(".pdf-scroll");
+      if (!sc) return;
+      var v = el.querySelector(".pdf-ind-v"), h = el.querySelector(".pdf-ind-h");
+      function place(track, thumb, view, total, pos, vertical) {
+        if (total <= view + 2) { track.classList.remove("on"); return; }
+        track.classList.add("on");
+        var size = vertical ? track.clientHeight : track.clientWidth;
+        var len = Math.max(36, size * view / total);
+        var off = pos / (total - view) * (size - len);
+        thumb.style[vertical ? "height" : "width"] = len + "px";
+        thumb.style[vertical ? "top" : "left"] = Math.min(Math.max(off, 0), size - len) + "px";
+      }
+      place(v, v.firstChild, sc.clientHeight, sc.scrollHeight, sc.scrollTop, true);
+      place(h, h.firstChild, sc.clientWidth, sc.scrollWidth, sc.scrollLeft, false);
+    }
     function initMobilePdf(el) {
       var url = el.getAttribute("data-url");
       var scroll = el.querySelector(".pdf-scroll");
       var tok = paperToken;
       var run = (el._run = (el._run || 0) + 1);
+      if (!el._indBound) {
+        el._indBound = true;
+        var tick = false;
+        scroll.addEventListener("scroll", function () {
+          if (tick) return;
+          tick = true;
+          requestAnimationFrame(function () { tick = false; updatePdfIndicators(el); });
+        }, { passive: true });
+      }
       function alive() { return tok === paperToken && el._run === run && document.body.contains(el); }
       if (!el._doc) {
         el._doc = loadPdfJs().then(function (pdfjs) {
@@ -1537,6 +1577,7 @@
           c.style.height = c.dataset.h + "px";
           scroll.appendChild(c);
           el._canvases.push(c);
+          updatePdfIndicators(el);
           try {
             await page.render({ canvasContext: c.getContext("2d"), viewport: vpHi }).promise;
           } catch (err) {
@@ -1544,6 +1585,7 @@
             console.error("PDF page", i, err);
           }
         }
+        updatePdfIndicators(el);
         if (!el._zoomBound) {            // double tap = zoom in / out
           el._zoomBound = true;
           var last = 0;
@@ -1556,6 +1598,7 @@
                 cv.style.width = cv.dataset.w * k + "px";
                 cv.style.height = cv.dataset.h * k + "px";
               });
+              updatePdfIndicators(el);
             }
             last = now;
           });
@@ -1579,6 +1622,7 @@
         if (!el || !el._doc) return;
         var sc = el.querySelector(".pdf-scroll");
         if (Math.abs(sc.clientWidth - (el._w || 0)) > 8) initMobilePdf(el);
+        else updatePdfIndicators(el);
       }, 250);
     });
 
