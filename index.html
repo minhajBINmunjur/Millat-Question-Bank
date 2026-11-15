@@ -559,12 +559,12 @@
     [class*="border-blue-500"], [class*="border-orange-500"], [class*="border-slate-500"], [class*="border-amber-500"] { border-color:var(--acc-line) !important; }
     .hover\:border-emerald-500:hover, .hover\:border-emerald-400:hover, .focus\:border-emerald-500:focus { border-color:var(--acc) !important; }
 
-    /* Alim / Dakhil bars: one calm tone, only the dot tells them apart */
+    /* Alim / Dakhil bars: one calm tone */
     .bg-emerald-950\/90, .bg-rose-950\/90 { background:var(--bar) !important; }
     .text-emerald-100, .text-rose-100 { color:var(--ink) !important; }
     .bg-emerald-900, .bg-rose-900 { background:transparent !important; }
     .bg-emerald-400 { background:var(--acc) !important; }
-    .bg-rose-400 { background:#c9b48a !important; }
+    .bg-rose-400 { background:var(--acc) !important; }
 
     /* Exam banners + year pills: one quiet style */
     .exam-header-banner { background:var(--bar) !important; color:var(--ink) !important; border:1px solid var(--acc-line) !important; box-shadow:none !important; }
@@ -582,14 +582,15 @@
     }
 
     /* Logo tile (page 2/3) */
-    .mqb-logo { width:2.5rem; height:2.5rem; border-radius:.75rem; display:flex; align-items:center; justify-content:center; background:rgba(228,103,95,.12); color:#e4675f; border:1px solid rgba(228,103,95,.28); transition:transform .2s ease; }
+    .mqb-logo { width:2.5rem; height:2.5rem; border-radius:.75rem; display:flex; align-items:center; justify-content:center; background:var(--acc-bg); color:var(--acc); border:1px solid var(--acc-line); transition:transform .2s ease; }
     .group:hover .mqb-logo { transform:scale(1.05); }
     #header-actions { margin-left:auto; }
 
     /* Page 1 wordmark */
     .mqb-hero { text-align:center; padding:2.5rem 0 1.25rem; }
-    .mqb-hero h2 { font-weight:300; font-size:clamp(1.5rem, 6.6vw, 4.25rem); letter-spacing:.04em; line-height:1.1; color:var(--ink); }
-    .mqb-rule { width:44px; height:2px; border-radius:2px; background:var(--acc); opacity:.8; margin:1.1rem auto 0; }
+    .mqb-hero h2 { font-weight:700; font-size:clamp(1.65rem, 7.2vw, 5.25rem); letter-spacing:.015em; line-height:1.08; color:var(--ink); }
+    @supports (-webkit-background-clip:text) or (background-clip:text) { .mqb-hero h2 { background:linear-gradient(100deg, var(--ink) 35%, var(--acc) 100%); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; } }
+    .mqb-rule { width:72px; height:3px; border-radius:2px; background:var(--acc); opacity:.8; margin:1.1rem auto 0; }
     @media (max-width:639.98px) { #page-campuses > div.mqb-hero { padding:1.25rem 0 .5rem !important; } }
 
     /* Campus switch dropdown (page 2) */
@@ -617,7 +618,7 @@
       
       <!-- Brand Logo -->
       <div id="brand" style="display:none" onclick="goToPage('campuses')" class="flex items-center gap-3 cursor-pointer group">
-        <div class="mqb-logo"><i class="fa-solid fa-file-circle-question text-lg"></i></div>
+        <div class="mqb-logo"><i class="fa-solid fa-file-lines text-lg"></i></div>
         <div>
           <h1 class="text-lg font-bold tracking-tight text-white group-hover:text-emerald-400 transition-colors">
             Millat Question Bank
