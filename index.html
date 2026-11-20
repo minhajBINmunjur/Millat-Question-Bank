@@ -29,6 +29,7 @@
   <link rel="preload" as="image" href="images/tongi.webp" type="image/webp" />
   <link rel="preload" as="image" href="images/mohila.webp" type="image/webp" media="(min-width: 768px)" />
   <link rel="preload" as="image" href="images/dhaka.webp" type="image/webp" media="(min-width: 768px)" />
+  <link rel="preload" as="image" href="images/board.webp" type="image/webp" media="(min-width: 768px)" />
   
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin>
@@ -602,6 +603,17 @@
     .campus-menu p { padding:6px 12px 4px; font-size:.72rem; color:var(--acc); }
     .campus-menu button { display:flex; width:100%; align-items:center; gap:10px; text-align:left; padding:11px 12px; border-radius:10px; font-size:.9rem; color:var(--ink); background:none; border:0; cursor:pointer; }
     .campus-menu button:hover, .campus-menu button:focus-visible { background:var(--acc-bg); outline:none; }
+
+    /* ===== Page 1 grid: 4 options (3 campuses + Madrasah Board); cards a little smaller on desktop ===== */
+    @media (min-width:768px) {
+      .campus-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem !important; }
+      .campus-img { height: clamp(110px, calc(100vh - 540px), 170px) !important; }
+      #page-campuses .campus-grid h3 { font-size: 1rem; line-height: 1.35; }
+      #page-campuses .campus-grid .p-3 { padding: .6rem; }
+    }
+    @media (min-width:1024px) {
+      .campus-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.1rem !important; }
+    }
   </style>
   <noscript><style>.campus-img > img, .hero-img > img { opacity: 1 !important; }</style></noscript>
 </head>
@@ -683,7 +695,7 @@
       </div>
 
       <!-- 3 Campus Cards (With user's exact corrected names & badges removed) -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 pt-2">
+      <div class="grid grid-cols-1 campus-grid gap-6 sm:gap-8 pt-2">
         
         <!-- CARD 1: Tamirul Millat Kamil Madrasah, Tongi -->
         <div
@@ -760,6 +772,31 @@
           </div>
         </div>
 
+        <!-- CARD 4: Madrasah Board -->
+        <div
+          onclick="selectCampus('board')"
+          class="group relative cursor-pointer rounded-2xl overflow-hidden border-2 border-slate-800 hover:border-emerald-500 bg-slate-900/80 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/20 flex flex-col"
+        >
+          <div class="relative campus-img w-full overflow-hidden bg-slate-950">
+            <img class="w-full h-full object-cover" width="1024" height="537" alt="" decoding="async"
+              src="images/board.webp" />
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+          </div>
+
+          <div class="p-3 flex-1 flex flex-col justify-between space-y-2">
+            <div>
+              <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">
+                Madrasah Board
+              </h3>
+              <p class="text-xs text-slate-400 font-bangla mt-1 campus-count" data-campus="board">&nbsp;</p>
+            </div>
+
+            <button class="w-full py-1.5 px-4 rounded-xl bg-slate-800 group-hover:bg-emerald-600 text-slate-200 group-hover:text-white font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm font-bangla">
+              <span>প্রশ্ন খুজ</span>
+            </button>
+          </div>
+        </div>
+
       </div>
 
     </section>
@@ -775,7 +812,7 @@
         <div>
           <div class="flex items-center gap-2 text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-1">
             <i class="fa-solid fa-location-dot"></i>
-            <span>নির্বাচিত ক্যাম্পাস</span>
+            <span id="page2-campus-label">নির্বাচিত ক্যাম্পাস</span>
           </div>
           <h2 id="page2-campus-title" class="text-2xl sm:text-3xl font-extrabold text-white">
             Campus Name
@@ -1040,6 +1077,7 @@
             <option>Tamirul Millat Kamil Madrasah, Tongi</option>
             <option>Tamirul Millat Mohila Kamil Madrasah</option>
             <option>Tamirul Millat Kamil Madrasah Dhaka</option>
+            <option>Madrasah Board</option>
           </select>
         </div>
 
@@ -1113,6 +1151,12 @@
         name: "Tamirul Millat Kamil Madrasah Dhaka",
         bnName: "তা'মীরুল মিল্লাত কামিল মাদ্রাসা, ঢাকা (যাত্রাবাড়ী)",
         image: "images/dhaka.webp"
+      },
+      board: {
+        id: "board",
+        name: "Madrasah Board",
+        bnName: "মাদ্রাসা বোর্ড",
+        image: "images/board.webp"
       }
     };
 
@@ -1167,6 +1211,7 @@
 
           // Set titles
           document.getElementById("page2-campus-title").textContent = currentCampus.name;
+          document.getElementById("page2-campus-label").textContent = currentCampus.id === "board" ? "নির্বাচিত বোর্ড" : "নির্বাচিত ক্যাম্পাস";
           document.getElementById("breadcrumb-campus").textContent = currentCampus.name;
           document.getElementById("breadcrumb-sub-wrap").style.display = "none";
         }
@@ -1207,7 +1252,7 @@
         var b = document.createElement("button");
         b.type = "button";
         var ic = document.createElement("i");
-        ic.className = "fa-solid fa-location-dot text-xs";
+        ic.className = (k === "board" ? "fa-solid fa-building-columns" : "fa-solid fa-location-dot") + " text-xs";
         var sp = document.createElement("span");
         sp.textContent = CAMPUS_CONFIG[k].name;
         b.appendChild(ic); b.appendChild(sp);
@@ -1292,7 +1337,7 @@
     ]);
 
     // ---- Auto question count per campus (shown on the campus cards) ----
-    const PAPER_NAME_RE = /^pdfs\/(tongi|mohila|dhaka)_[a-z0-9-]+_[a-z0-9-]+_\d{4}\.pdf$/;
+    const PAPER_NAME_RE = /^pdfs\/(tongi|mohila|dhaka|board)_[a-z0-9-]+_[a-z0-9-]+_\d{4}\.pdf$/;
     function toBnDigits(n) {
       return String(n).replace(/\d/g, function (d) { return "০১২৩৪৫৬৭৮৯"[d]; });
     }
@@ -1300,7 +1345,7 @@
     setTimeout(function () { countsForced = true; updateCampusCounts(); }, 2500);
     function updateCampusCounts() {
       if (apiState !== "ok" && apiState !== "failed" && !countsForced) return;
-      var counts = { tongi: 0, mohila: 0, dhaka: 0 };
+      var counts = { tongi: 0, mohila: 0, dhaka: 0, board: 0 };
       AVAILABLE_PAPERS.forEach(function (path) {
         var m = PAPER_NAME_RE.exec(path);
         if (m) counts[m[1]]++;
@@ -1731,6 +1776,11 @@
       }
       if (q.includes("dhaka") || q.includes("ঢাকা") || q.includes("যাত্রাবাড়ী")) {
         selectCampus("dhaka");
+        return;
+      }
+
+      if (q.includes("board") || q.includes("বোর্ড")) {
+        selectCampus("board");
         return;
       }
 
