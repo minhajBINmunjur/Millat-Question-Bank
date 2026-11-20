@@ -9,7 +9,7 @@ module.exports = (req, res) => {
     try {
       cachedFiles = fs
         .readdirSync(path.join(process.cwd(), "pdfs"))
-        .filter((f) => /^(tongi|mohila|dhaka|board)_[a-z0-9-]+_[a-z0-9-]+_\d{4}\.pdf$/.test(f));
+        .filter((f) => /^((tongi|mohila|dhaka)_[a-z0-9-]+_[a-z0-9-]+|board_[a-z0-9-]+)_\d{4}\.pdf$/.test(f));
     } catch (e) {
       cachedFiles = [];
     }
