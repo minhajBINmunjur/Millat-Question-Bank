@@ -1012,6 +1012,26 @@
           </div>
         </div>
 
+        <!-- Madrasah Board: only years (no exam sections). File: pdfs/board_<subject>_<year>.pdf -->
+        <div id="board-years" style="display: none;" class="rounded-2xl border-2 border-blue-500/30 glass-card overflow-hidden shadow-xl">
+          <div class="p-6 sm:p-7">
+            <div class="year-grid">
+              <button class="year-pill-btn year-pill-blue" onclick="openQuestionModal('board', '2015')">2015</button>
+              <button class="year-pill-btn year-pill-blue" onclick="openQuestionModal('board', '2016')">2016</button>
+              <button class="year-pill-btn year-pill-blue" onclick="openQuestionModal('board', '2017')">2017</button>
+              <button class="year-pill-btn year-pill-blue" onclick="openQuestionModal('board', '2018')">2018</button>
+              <button class="year-pill-btn year-pill-blue" onclick="openQuestionModal('board', '2019')">2019</button>
+              <button class="year-pill-btn year-pill-blue" onclick="openQuestionModal('board', '2020')">2020</button>
+              <button class="year-pill-btn year-pill-blue" onclick="openQuestionModal('board', '2021')">2021</button>
+              <button class="year-pill-btn year-pill-blue" onclick="openQuestionModal('board', '2022')">2022</button>
+              <button class="year-pill-btn year-pill-blue" onclick="openQuestionModal('board', '2023')">2023</button>
+              <button class="year-pill-btn year-pill-blue" onclick="openQuestionModal('board', '2024')">2024</button>
+              <button class="year-pill-btn year-pill-blue" onclick="openQuestionModal('board', '2025')">2025</button>
+              <button class="year-pill-btn year-pill-blue" onclick="openQuestionModal('board', '2026')">2026</button>
+            </div>
+          </div>
+        </div>
+
       </div>
 
     </section>
@@ -1292,7 +1312,7 @@
 
       document.getElementById("modal-campus-badge").textContent = `${cName} • ${pName}`;
       document.getElementById("modal-subject-year").textContent = `${sName} — ${year}`;
-      document.getElementById("modal-exam-title").textContent = `পরীক্ষা: ${examType}`;
+      document.getElementById("modal-exam-title").textContent = examType === "board" ? "মাদ্রাসা বোর্ড পরীক্ষা" : `পরীক্ষা: ${examType}`;
 
       modal.style.display = "flex";
       currentExam = examType;
@@ -1319,7 +1339,8 @@
       "1st semester/half yearly": "half-yearly",
       "yearly/year final": "yearly",
       "pre-test": "pre-test",
-      "test": "test"
+      "test": "test",
+      "board": "board"
     };
     const PAPER_EMPTY_HTML =
       '<div class="p-10 bg-slate-950/60 text-center">' +
@@ -1337,7 +1358,7 @@
     ]);
 
     // ---- Auto question count per campus (shown on the campus cards) ----
-    const PAPER_NAME_RE = /^pdfs\/(tongi|mohila|dhaka|board)_[a-z0-9-]+_[a-z0-9-]+_\d{4}\.pdf$/;
+    const PAPER_NAME_RE = /^pdfs\/(?:(tongi|mohila|dhaka)_[a-z0-9-]+_[a-z0-9-]+|(board)_[a-z0-9-]+)_\d{4}\.pdf$/;
     function toBnDigits(n) {
       return String(n).replace(/\d/g, function (d) { return "০১২৩৪৫৬৭৮৯"[d]; });
     }
@@ -1348,7 +1369,7 @@
       var counts = { tongi: 0, mohila: 0, dhaka: 0, board: 0 };
       AVAILABLE_PAPERS.forEach(function (path) {
         var m = PAPER_NAME_RE.exec(path);
-        if (m) counts[m[1]]++;
+        if (m) counts[m[1] || m[2]]++;
       });
       document.querySelectorAll(".campus-count").forEach(function (el) {
         el.textContent = "আপাতত " + toBnDigits(counts[el.dataset.campus] || 0) + " টি প্রশ্ন আছে";
@@ -1411,9 +1432,11 @@
       var page = document.getElementById("page-exams");
       if (!page || !currentSubject) return;
       var visibleCount = 0, probes = 0;
+      var isBoard = !!(currentCampus && currentCampus.id === "board");
       page.querySelectorAll(".year-pill-btn").forEach(function (btn) {
         var m = /openQuestionModal\('([^']+)',\s*'(\d{4})'\)/.exec(btn.getAttribute("onclick") || "");
         if (!m) return;
+        if (isBoard !== !!btn.closest("#board-years")) { btn.style.display = "none"; return; }
         var url = pdfPathFor(m[1], m[2]);
         var show = AVAILABLE_PAPERS.has(url) || paperExistsCache[url] === true;
         if (!show && apiState === "failed" && paperExistsCache[url] === undefined) {
@@ -1509,6 +1532,7 @@
       if (sub === "ict") sub += "-" + (currentProgram || "alim").toLowerCase();
       const exam = EXAM_SLUGS[examType] || slugify(examType);
       const campus = currentCampus ? currentCampus.id : "tongi";
+      if (campus === "board") return `pdfs/board_${sub}_${year}.pdf`;
       return `pdfs/${campus}_${sub}_${exam}_${year}.pdf`;
     }
 
