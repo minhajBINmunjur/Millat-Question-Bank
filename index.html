@@ -617,14 +617,18 @@
 
     /* ===== "প্রশ্ন পাঠাও" floats under the share icons (same look, small gap) ===== */
     #shareBar .sh-send {
-      position: absolute; right: 0; left: auto; top: 100%; margin-top: 20px;
+      position: absolute; right: 0; left: auto; top: 100%; margin-top: 34px;
       width: auto; height: auto; padding: 7px 13px; gap: 8px; border-radius: 10px;
       font-family: "Anek Bangla", "Plus Jakarta Sans", sans-serif; font-size: 14px; font-weight: 600;
       white-space: nowrap;
     }
     #shareBar .sh-send i { font-size: 13px; }
+    /* Desktop / tablet: the button sits above the share icons (right side, near the title row) */
+    @media (min-width: 640px) {
+      #shareBar .sh-send { top: auto; bottom: 100%; margin-top: 0; margin-bottom: 110px; }
+    }
     @media (max-width: 639.98px) {
-      #shareBar .sh-send { margin-top: 16px; padding: 5px 10px; gap: 6px; border-radius: 8px; font-size: 12px; }
+      #shareBar .sh-send { margin-top: 28px; padding: 5px 10px; gap: 6px; border-radius: 8px; font-size: 12px; }
       #shareBar .sh-send i { font-size: 11px; }
     }
 
