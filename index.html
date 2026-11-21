@@ -613,6 +613,8 @@
     }
     @media (min-width:1024px) {
       .campus-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.1rem !important; }
+      /* 2-line title space on every card, so the "আপাতত … টি প্রশ্ন আছে" lines (and buttons) line up across the row */
+      #page-campuses .campus-grid h3 { min-height: 2.7em; }
     }
 
     /* ===== "প্রশ্ন পাঠাও" floats under the share icons (same look, small gap) ===== */
