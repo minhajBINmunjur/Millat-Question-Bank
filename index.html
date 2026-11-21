@@ -616,8 +616,17 @@
     }
 
     /* ===== "প্রশ্ন পাঠাও" floats under the share icons (same look, small gap) ===== */
-    #shareBar .sh-send { position: absolute; left: 0; top: 100%; margin-top: 14px; }
-    @media (max-width: 639.98px) { #shareBar .sh-send { margin-top: 10px; } }
+    #shareBar .sh-send {
+      position: absolute; right: 0; left: auto; top: 100%; margin-top: 20px;
+      width: auto; height: auto; padding: 7px 13px; gap: 8px; border-radius: 10px;
+      font-family: "Anek Bangla", "Plus Jakarta Sans", sans-serif; font-size: 14px; font-weight: 600;
+      white-space: nowrap;
+    }
+    #shareBar .sh-send i { font-size: 13px; }
+    @media (max-width: 639.98px) {
+      #shareBar .sh-send { margin-top: 16px; padding: 5px 10px; gap: 6px; border-radius: 8px; font-size: 12px; }
+      #shareBar .sh-send i { font-size: 11px; }
+    }
 
     /* ===== Desktop: page 1 (title + cards) vertically centred on the screen ===== */
     @media (min-width: 768px) {
@@ -1858,7 +1867,7 @@
     <button type="button" class="sh-msn" data-s="msn" aria-label="Messenger এ শেয়ার করো" title="Messenger"><i class="fa-brands fa-facebook-messenger"></i></button>
     <button type="button" class="sh-wa" data-s="wa" aria-label="WhatsApp এ শেয়ার করো" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></button>
     <button type="button" class="sh-tg" data-s="tg" aria-label="Telegram এ শেয়ার করো" title="Telegram"><i class="fa-brands fa-telegram"></i></button>
-    <button type="button" class="sh-send" onclick="openSubmitQuestionModal()" aria-label="প্রশ্ন পাঠাও" title="প্রশ্ন পাঠাও"><i class="fa-solid fa-paper-plane"></i></button>
+    <button type="button" class="sh-send" onclick="openSubmitQuestionModal()" aria-label="প্রশ্ন পাঠাও" title="প্রশ্ন পাঠাও"><i class="fa-solid fa-paper-plane"></i><span>প্রশ্ন পাঠাও</span></button>
   </div>
   <div id="shareToast" role="status"></div>
   <script>
